@@ -40,7 +40,7 @@ pytest -q
 - `validate_coco()` runs before the file is written.
 - Augmentation boxes are the bounding box of the four transformed corners, masks use nearest-neighbour warps. Tests check both against ground truth.
 
-Dataset: 171 images, 191 annotations (circuit_board 87, robot_arm 66, drone 38), split 137 train / 34 val.
+Dataset: 190 images, 212 annotations (circuit_board 92, robot_arm 69, drone 51), split 152 train / 38 val. (The first version had 171 images; the scrape was extended to 80 per class.)
 
 ## Model
 
@@ -53,25 +53,35 @@ The CNN predicts the class and one normalized box (the largest object) per image
 
 ## Training run
 
-Full log in `docs/train_log.txt`. Early stopping triggered at epoch 16.
+Full log in `docs/improved/train_log.txt` (metrics in `docs/improved/metrics.jsonl`, baseline in `docs/baseline/`).
+`python train.py --epochs 40 --patience 8`, seed 42. Early stopping triggered at epoch 25, best epoch 17.
+`metrics.jsonl` now also has `val_iou`.
 
 ```
-epoch 1 train 1.2010 val 1.1667 acc 0.382 l1 0.1518 lr 1.00e-03
-epoch 8 train 0.9214 val 1.0071 acc 0.529 l1 0.1562 lr 9.26e-04
-epoch 15 train 0.8948 val 1.1337 acc 0.588 l1 0.1694 lr 7.27e-04
-early stopping at epoch 16
+epoch 1 train 1.1752 val 1.1687 acc 0.316 l1 0.1409 iou 0.452 lr 1.00e-03
+epoch 17 train 0.9070 val 0.8503 acc 0.658 l1 0.1218 iou 0.519 lr 6.55e-04
+early stopping at epoch 25
 ```
 
-With 137 training images the model only reaches about 50 to 59 percent validation accuracy. More data would help most.
+| | data | val_loss | val_acc | val_box_l1 | val_iou |
+| --- | --- | --- | --- | --- | --- |
+| Baseline, seed 42 | 171 images, 34 val | 1.007 | 0.529 | 0.156 | 0.392 |
+| Final, seed 42 | 190 images, 38 val | 0.850 | 0.658 | 0.122 | 0.519 |
+| Baseline, mean of seeds 42/1/2 | 171 images | 0.923 +- 0.066 | 0.559 +- 0.042 | 0.145 +- 0.012 | 0.450 +- 0.042 |
+| Final, mean of seeds 42/1/2 | 190 images | 0.849 +- 0.127 | 0.667 +- 0.075 | 0.130 +- 0.008 | 0.487 +- 0.027 |
+
+The val sets differ between rows (the split depends on the data size and the seed), and val has only 34 to 38 images, so
+these are tentative. The only change kept is more data. Class-weighted loss, stronger augmentation, label smoothing, weight
+decay, warmup and head dropout did not give a result that held up; details and per-seed numbers are in `docs/experiments.md`.
 
 ## Auditor
 
 Tools: `find_small_boxes`, `class_balance`, `bbox_area_stats`. Output of the tools on the real annotations:
 
 ```
-class_balance -> circuit_board 87, robot_arm 66, drone 38, imbalance ratio 2.29
-find_small_boxes(max_area_fraction=0.02) -> 11 of 191 boxes (circuit_board 3, robot_arm 3, drone 5)
-bbox_area_stats -> median area fraction: circuit_board 0.33, robot_arm 0.14, drone 0.06
+class_balance -> circuit_board 92, robot_arm 69, drone 51, imbalance ratio 1.8
+find_small_boxes(max_area_fraction=0.02) -> 13 of 212 boxes (circuit_board 3, robot_arm 3, drone 7)
+bbox_area_stats -> median area fraction: circuit_board 0.36, robot_arm 0.14, drone 0.09
 ```
 
 LLM demo (two tool-call scenarios and a retrieval question), saved to `docs/demo_output.txt`:

@@ -138,10 +138,20 @@ def train_one_epoch(model, loader, criterion, optimizer, device):
     return total / max(count, 1), first
 
 
+def cxcywh_iou(a, b):
+    """Per-row IoU of two (N,4) cxcywh tensors."""
+    a1, a2 = a[:, :2] - a[:, 2:] / 2, a[:, :2] + a[:, 2:] / 2
+    b1, b2 = b[:, :2] - b[:, 2:] / 2, b[:, :2] + b[:, 2:] / 2
+    wh = (torch.minimum(a2, b2) - torch.maximum(a1, b1)).clamp(min=0)
+    inter = wh[:, 0] * wh[:, 1]
+    union = a[:, 2] * a[:, 3] + b[:, 2] * b[:, 3] - inter
+    return inter / union.clamp(min=1e-9)
+
+
 def evaluate(model, loader, criterion, device):
-    """Returns (val_loss, accuracy, mean box L1) without gradients."""
+    """Returns (val_loss, accuracy, mean box L1, mean box IoU) without gradients."""
     model.eval()
-    loss_sum, correct, l1_sum, count = 0.0, 0, 0.0, 0
+    loss_sum, correct, l1_sum, iou_sum, count = 0.0, 0, 0.0, 0.0, 0
     with torch.no_grad():
         for batch in loader:
             images = batch["image"].to(device)
@@ -152,9 +162,10 @@ def evaluate(model, loader, criterion, device):
             loss_sum += criterion(logits, pred, labels, boxes).item() * n
             correct += (logits.argmax(1) == labels).sum().item()
             l1_sum += (pred - boxes).abs().mean(1).sum().item()
+            iou_sum += cxcywh_iou(pred, boxes).sum().item()
             count += n
     count = max(count, 1)
-    return loss_sum / count, correct / count, l1_sum / count
+    return loss_sum / count, correct / count, l1_sum / count, iou_sum / count
 
 
 def draw_box_sample(image, box):
@@ -200,20 +211,21 @@ def train(model, train_loader, val_loader, epochs=30, lr=1e-3, patience=5, seed=
     history = []
     for epoch in range(1, epochs + 1):
         train_loss, first_batch = train_one_epoch(model, train_loader, criterion, optimizer, device)
-        val_loss, val_acc, val_l1 = evaluate(model, val_loader, criterion, device)
+        val_loss, val_acc, val_l1, val_iou = evaluate(model, val_loader, criterion, device)
         current_lr = optimizer.param_groups[0]["lr"]
         scheduler.step()
         record = {"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss,
-                  "val_acc": val_acc, "val_box_l1": val_l1, "lr": current_lr}
+                  "val_acc": val_acc, "val_box_l1": val_l1, "val_iou": val_iou, "lr": current_lr}
         history.append(record)
         append_metrics(metrics_path, record)
         writer.add_scalars("loss", {"train": train_loss, "val": val_loss}, epoch)
         writer.add_scalar("val/acc", val_acc, epoch)
         writer.add_scalar("val/box_l1", val_l1, epoch)
+        writer.add_scalar("val/iou", val_iou, epoch)
         writer.add_scalar("lr", current_lr, epoch)
         log_samples(writer, first_batch, epoch)
         print(f"epoch {epoch} train {train_loss:.4f} val {val_loss:.4f} acc {val_acc:.3f} "
-              f"l1 {val_l1:.4f} lr {current_lr:.2e}")
+              f"l1 {val_l1:.4f} iou {val_iou:.3f} lr {current_lr:.2e}")
         if stopper.step(val_loss, model):
             print(f"early stopping at epoch {epoch}")
             break
