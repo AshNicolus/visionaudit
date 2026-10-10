@@ -1,0 +1,13 @@
+{
+ "seed": 42,
+ "cmd": "python train.py --epochs 40 --patience 8",
+ "epochs_run": 16,
+ "best": {
+  "epoch": 8,
+  "train_loss": 0.921377064537828,
+  "val_loss": 1.0070790332906387,
+  "val_acc": 0.5294117647058824,
+  "val_box_l1": 0.1561826897018096,
+  "lr": 0.000926320082177046
+ }
+}
