@@ -1,0 +1,50 @@
+{
+  "selection": "epoch with lowest val_loss",
+  "seeds": {
+    "42": {
+      "best_epoch": 17,
+      "epochs_run": 25,
+      "val_loss": 0.8502907031460812,
+      "val_acc": 0.6578947368421053,
+      "val_box_l1": 0.12178377415004529,
+      "val_iou": 0.5190941095352173
+    },
+    "1": {
+      "best_epoch": 36,
+      "epochs_run": 40,
+      "val_loss": 0.6929509671110856,
+      "val_acc": 0.7631578947368421,
+      "val_box_l1": 0.1270903003843207,
+      "val_iou": 0.4899173849507382
+    },
+    "2": {
+      "best_epoch": 3,
+      "epochs_run": 11,
+      "val_loss": 1.0029737384695756,
+      "val_acc": 0.5789473684210527,
+      "val_box_l1": 0.14134870704851651,
+      "val_iou": 0.45279359817504883
+    }
+  },
+  "mean": {
+    "val_loss": 0.8487384695755807,
+    "val_acc": 0.6666666666666666,
+    "val_box_l1": 0.1300742605276275,
+    "val_iou": 0.48726836422033476
+  },
+  "std": {
+    "val_loss": 0.1265710255469044,
+    "val_acc": 0.07545899357054936,
+    "val_box_l1": 0.0082613422409458,
+    "val_iou": 0.02713180710012435
+  },
+  "sha256": {
+    "annotations.json": "0c2dba57ab20aad0965ef8a295f9197bd3acf8f8af6e4e6029e56f53003e4e6e",
+    "raw_meta.json": "9225c64733d6cef50318e7ed197f2aa68c66083294f2a49f60a046dfaea51e51"
+  },
+  "commands": [
+    "git checkout aa17183  # main at baseline time",
+    "python -u train.py --epochs 40 --patience 8 --seed {42,1,2}",
+    "# data: docs/baseline_v2/annotations.json -> data/coco/annotations.json, raw_meta.json -> data/raw_meta.json"
+  ]
+}
