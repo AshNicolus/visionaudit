@@ -109,7 +109,9 @@ def lr_factor(epoch, epochs, warmup):
 class EarlyStopping:
     """Stops when val loss has not improved for `patience` epochs; saves the best model."""
 
-    def __init__(self, patience=5, min_delta=0.0, path="runs/best.pt"):
+    def __init__(self, patience=5, min_delta=0.0, path="runs/best.pt", min_epoch=1):
+        self.min_epoch = min_epoch  # no checkpoint or patience counting before this epoch
+        self.epoch = 0
         self.patience = patience
         self.min_delta = min_delta
         self.path = Path(path)
@@ -118,6 +120,9 @@ class EarlyStopping:
         self.should_stop = False
 
     def step(self, val_loss, model):
+        self.epoch += 1
+        if self.epoch < self.min_epoch:
+            return False
         if val_loss < self.best - self.min_delta:
             self.best = val_loss
             self.bad_epochs = 0
@@ -243,7 +248,7 @@ def append_metrics(path, record):
 
 def train(model, train_loader, val_loader, epochs=30, lr=1e-3, patience=5, seed=42,
           run_dir="runs", device=None, box_weight=5.0, label_smoothing=0.0, weight_decay=1e-4,
-          warmup=0, ema_decay=0.0, tb=True):
+          warmup=0, ema_decay=0.0, tb=True, min_epoch=1):
     """Full training run; returns the list of per-epoch metric dicts."""
     set_seed(seed)
     device = device or get_device()
@@ -260,7 +265,7 @@ def train(model, train_loader, val_loader, epochs=30, lr=1e-3, patience=5, seed=
     else:
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
     ema = EMA(model, ema_decay) if ema_decay else None
-    stopper = EarlyStopping(patience, path=run_dir / "best.pt")
+    stopper = EarlyStopping(patience, path=run_dir / "best.pt", min_epoch=min_epoch)
     writer = SummaryWriter(str(run_dir / "tb")) if tb else None
     history = []
     for epoch in range(1, epochs + 1):
@@ -308,6 +313,7 @@ def parse_args(argv=None):
     p.add_argument("--crop-prob", type=float, default=0.0, help="zoom-in crop around the box")
     p.add_argument("--width", type=float, default=1.0)
     p.add_argument("--deep", action="store_true")
+    p.add_argument("--min-epoch", type=int, default=1, help="no best-checkpoint before this epoch")
     p.add_argument("--run-dir", default=str(HERE / "runs"))
     p.add_argument("--ann-path", default=str(HERE / "data/coco/annotations.json"))
     p.add_argument("--img-dir", default=str(HERE / "data/images"))
@@ -326,7 +332,8 @@ def main(argv=None):
     model = CustomCNN(num_classes, width=args.width, deep=args.deep)
     train(model, train_loader, val_loader, args.epochs, args.lr, args.patience, args.seed,
           run_dir=args.run_dir, label_smoothing=args.label_smoothing,
-          weight_decay=args.weight_decay, warmup=args.warmup, ema_decay=args.ema)
+          weight_decay=args.weight_decay, warmup=args.warmup, ema_decay=args.ema,
+          min_epoch=args.min_epoch)
 
 
 if __name__ == "__main__":

@@ -44,12 +44,12 @@ def make_folds(ann_path, meta_path, img_dir, fold_seed=FOLD_SEED):
     return folds, g
 
 
-def run_fold(k, split, args):
+def run_fold(k, split, args, rep=0):
     tr, val, te = split
     mk = lambda idx, train, seed: CocoDataset(  # noqa: E731
         args.ann_path, args.img_dir, idx.tolist(), args.img_size, train=train, seed=seed,
         crop_prob=args.crop_prob if train else 0.0)
-    seed = 100 + k
+    seed = 100 + k + 1000 * rep
     T.set_seed(seed)
     gen = torch.Generator().manual_seed(seed)
     tr_loader = DataLoader(mk(tr, True, seed), batch_size=args.batch_size, shuffle=True,
@@ -57,11 +57,11 @@ def run_fold(k, split, args):
     val_loader = DataLoader(mk(val, False, 0), batch_size=args.batch_size)
     te_loader = DataLoader(mk(te, False, 0), batch_size=args.batch_size)
     model = T.CustomCNN(3, width=args.width, deep=args.deep)
-    run_dir = HERE / "runs" / "cv" / args.name / f"fold{k}"
+    run_dir = HERE / "runs" / "cv" / args.name / f"fold{k}_s{rep}"
     hist = T.train(model, tr_loader, val_loader, args.epochs, args.lr, args.patience, seed,
                    run_dir=run_dir, box_weight=5.0, label_smoothing=args.label_smoothing,
                    weight_decay=args.weight_decay, warmup=args.warmup,
-                   ema_decay=args.ema, tb=args.tb)
+                   ema_decay=args.ema, tb=args.tb, min_epoch=args.min_epoch)
     dev = next(model.parameters()).device
     crit = T.DetectionLoss().to(dev)
     out = {}
@@ -69,8 +69,17 @@ def run_fold(k, split, args):
         loss, acc, l1, iou = T.evaluate(model, te_loader, crit, dev, tta=tta)
         out["tta" if tta else "plain"] = {"loss": loss, "acc": acc, "box_l1": l1, "iou": iou}
     best = min(hist, key=lambda r: r["val_loss"])
-    return {"fold": k, "n_train": len(tr), "n_inner_val": len(val), "n_test": len(te),
+    return {"seed_rep": rep, "n_train": len(tr), "n_inner_val": len(val), "n_test": len(te),
             "epochs_run": len(hist), "best_epoch": best["epoch"], **out}
+
+
+def average_reps(k, reps):
+    """Fold result = mean of the per-seed results; the seeds are kept for the record."""
+    out = {"fold": k, "n_test": reps[0]["n_test"], "seeds": reps}
+    for mode in ("plain", "tta"):
+        out[mode] = {m: float(np.mean([r[mode][m] for r in reps])) for m in reps[0][mode]}
+    out["best_epochs"] = [r["best_epoch"] for r in reps]
+    return out
 
 
 def summarize(folds, mode):
@@ -95,6 +104,8 @@ def parse_args(argv=None):
     p.add_argument("--width", type=float, default=1.0)
     p.add_argument("--deep", action="store_true")
     p.add_argument("--fold-seed", type=int, default=FOLD_SEED)
+    p.add_argument("--seeds", type=int, default=3, help="training seeds per fold, averaged")
+    p.add_argument("--min-epoch", type=int, default=5)
     p.add_argument("--tb", action="store_true", help="write TensorBoard logs per fold")
     p.add_argument("--ann-path", default=str(HERE / "data/coco/annotations.json"))
     p.add_argument("--img-dir", default=str(HERE / "data/images"))
@@ -110,10 +121,11 @@ def main(argv=None):
     results = []
     for k, split in enumerate(folds):
         t0 = time.time()
-        r = run_fold(k, split, args)
+        r = average_reps(k, [run_fold(k, split, args, rep) for rep in range(args.seeds)])
         results.append(r)
-        print(f"fold {k}: plain {r['plain']} tta acc {r['tta']['acc']:.3f} "
-              f"({time.time() - t0:.0f}s)", flush=True)
+        plain = {m: round(v, 3) for m, v in r["plain"].items()}
+        print(f"fold {k}: plain {plain} tta acc {r['tta']['acc']:.3f} "
+              f"best_ep {r['best_epochs']} ({time.time() - t0:.0f}s)", flush=True)
     out = {"name": args.name, "args": vars(args), "folds": results,
            "plain": summarize(results, "plain"), "tta": summarize(results, "tta")}
     Path(args.out_dir).mkdir(parents=True, exist_ok=True)

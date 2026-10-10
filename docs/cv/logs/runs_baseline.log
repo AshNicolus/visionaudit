@@ -1,0 +1,95 @@
+190 images, 167 groups
+epoch 1 train 1.2344 val 1.2271 acc 0.269 l1 0.1437 iou 0.405 lr 1.00e-03
+epoch 2 train 1.0341 val 1.2994 acc 0.346 l1 0.1375 iou 0.444 lr 9.98e-04
+epoch 3 train 0.9919 val 1.0747 acc 0.462 l1 0.1404 iou 0.440 lr 9.94e-04
+epoch 4 train 0.9522 val 1.1996 acc 0.500 l1 0.1327 iou 0.471 lr 9.86e-04
+epoch 5 train 0.9093 val 1.0542 acc 0.577 l1 0.1400 iou 0.494 lr 9.76e-04
+epoch 6 train 0.9186 val 1.1671 acc 0.577 l1 0.1357 iou 0.480 lr 9.62e-04
+epoch 7 train 0.8610 val 1.9332 acc 0.423 l1 0.1840 iou 0.426 lr 9.46e-04
+epoch 8 train 0.9178 val 1.0298 acc 0.577 l1 0.1327 iou 0.505 lr 9.26e-04
+epoch 9 train 0.8954 val 1.0159 acc 0.500 l1 0.1288 iou 0.502 lr 9.05e-04
+epoch 10 train 0.8775 val 1.6760 acc 0.462 l1 0.1588 iou 0.460 lr 8.80e-04
+epoch 11 train 0.8233 val 1.1058 acc 0.538 l1 0.1353 iou 0.500 lr 8.54e-04
+epoch 12 train 0.8446 val 1.1642 acc 0.500 l1 0.1417 iou 0.494 lr 8.25e-04
+epoch 13 train 0.9277 val 1.0901 acc 0.462 l1 0.1438 iou 0.482 lr 7.94e-04
+epoch 14 train 0.7995 val 1.2229 acc 0.538 l1 0.1488 iou 0.476 lr 7.61e-04
+epoch 15 train 0.8463 val 1.1353 acc 0.538 l1 0.1367 iou 0.498 lr 7.27e-04
+epoch 16 train 0.7093 val 1.4311 acc 0.462 l1 0.1517 iou 0.473 lr 6.91e-04
+epoch 17 train 0.8057 val 1.3450 acc 0.538 l1 0.1492 iou 0.469 lr 6.55e-04
+early stopping at epoch 17
+fold 0: plain {'loss': 1.4095477116735358, 'acc': 0.6052631578947368, 'box_l1': 0.14411566445702, 'iou': 0.4411302742205168} tta acc 0.605 (45s)
+epoch 1 train 1.1569 val 1.1822 acc 0.346 l1 0.1374 iou 0.433 lr 1.00e-03
+epoch 2 train 1.1294 val 1.0704 acc 0.577 l1 0.1319 iou 0.474 lr 9.98e-04
+epoch 3 train 0.9978 val 1.1124 acc 0.423 l1 0.1332 iou 0.475 lr 9.94e-04
+epoch 4 train 0.9772 val 0.9778 acc 0.423 l1 0.1331 iou 0.472 lr 9.86e-04
+epoch 5 train 0.9592 val 1.0276 acc 0.577 l1 0.1335 iou 0.469 lr 9.76e-04
+epoch 6 train 0.9450 val 0.9627 acc 0.462 l1 0.1316 iou 0.473 lr 9.62e-04
+epoch 7 train 0.8682 val 1.0957 acc 0.423 l1 0.1348 iou 0.475 lr 9.46e-04
+epoch 8 train 0.9414 val 0.9907 acc 0.423 l1 0.1339 iou 0.473 lr 9.26e-04
+epoch 9 train 0.9054 val 1.0166 acc 0.462 l1 0.1327 iou 0.471 lr 9.05e-04
+epoch 10 train 0.8788 val 0.9389 acc 0.615 l1 0.1351 iou 0.467 lr 8.80e-04
+epoch 11 train 0.8948 val 0.9140 acc 0.615 l1 0.1253 iou 0.495 lr 8.54e-04
+epoch 12 train 0.8373 val 0.9695 acc 0.538 l1 0.1372 iou 0.465 lr 8.25e-04
+epoch 13 train 0.8188 val 1.0789 acc 0.423 l1 0.1284 iou 0.482 lr 7.94e-04
+epoch 14 train 0.8123 val 0.9636 acc 0.577 l1 0.1254 iou 0.494 lr 7.61e-04
+epoch 15 train 0.8016 val 1.0239 acc 0.500 l1 0.1351 iou 0.477 lr 7.27e-04
+epoch 16 train 0.7710 val 1.0614 acc 0.577 l1 0.1243 iou 0.495 lr 6.91e-04
+epoch 17 train 0.7697 val 1.0439 acc 0.654 l1 0.1243 iou 0.501 lr 6.55e-04
+epoch 18 train 0.8441 val 1.0130 acc 0.577 l1 0.1309 iou 0.481 lr 6.17e-04
+epoch 19 train 0.7952 val 1.1790 acc 0.538 l1 0.1289 iou 0.488 lr 5.78e-04
+early stopping at epoch 19
+fold 1: plain {'loss': 0.9600208244825664, 'acc': 0.5526315789473685, 'box_l1': 0.13373349842272306, 'iou': 0.477051295732197} tta acc 0.553 (46s)
+epoch 1 train 1.1753 val 1.2142 acc 0.308 l1 0.1328 iou 0.442 lr 1.00e-03
+epoch 2 train 1.0297 val 1.6007 acc 0.269 l1 0.1273 iou 0.468 lr 9.98e-04
+epoch 3 train 0.9912 val 1.7883 acc 0.231 l1 0.1241 iou 0.484 lr 9.94e-04
+epoch 4 train 0.9386 val 1.2722 acc 0.231 l1 0.1136 iou 0.510 lr 9.86e-04
+epoch 5 train 0.9303 val 1.4501 acc 0.346 l1 0.1149 iou 0.503 lr 9.76e-04
+epoch 6 train 0.8804 val 1.3438 acc 0.462 l1 0.1094 iou 0.521 lr 9.62e-04
+epoch 7 train 0.9150 val 1.4893 acc 0.462 l1 0.1336 iou 0.481 lr 9.46e-04
+epoch 8 train 0.8873 val 1.5600 acc 0.308 l1 0.1067 iou 0.526 lr 9.26e-04
+epoch 9 train 0.9009 val 1.8336 acc 0.231 l1 0.1173 iou 0.504 lr 9.05e-04
+early stopping at epoch 9
+fold 2: plain {'loss': 1.2563356223859286, 'acc': 0.23684210526315788, 'box_l1': 0.14218640013744957, 'iou': 0.3812838698688306} tta acc 0.237 (23s)
+epoch 1 train 1.1844 val 1.2669 acc 0.280 l1 0.1287 iou 0.463 lr 1.00e-03
+epoch 2 train 1.0559 val 1.3243 acc 0.280 l1 0.1269 iou 0.482 lr 9.98e-04
+epoch 3 train 1.0187 val 0.9122 acc 0.400 l1 0.1284 iou 0.494 lr 9.94e-04
+epoch 4 train 0.9332 val 1.2555 acc 0.400 l1 0.1260 iou 0.487 lr 9.86e-04
+epoch 5 train 0.9456 val 0.9165 acc 0.560 l1 0.1291 iou 0.491 lr 9.76e-04
+epoch 6 train 0.8835 val 0.8989 acc 0.640 l1 0.1225 iou 0.507 lr 9.62e-04
+epoch 7 train 0.8632 val 1.4370 acc 0.600 l1 0.1411 iou 0.474 lr 9.46e-04
+epoch 8 train 0.8739 val 1.0712 acc 0.480 l1 0.1205 iou 0.516 lr 9.26e-04
+epoch 9 train 0.8309 val 1.7149 acc 0.640 l1 0.1508 iou 0.468 lr 9.05e-04
+epoch 10 train 0.9064 val 0.9163 acc 0.560 l1 0.1246 iou 0.502 lr 8.80e-04
+epoch 11 train 0.8696 val 1.4724 acc 0.400 l1 0.1288 iou 0.500 lr 8.54e-04
+epoch 12 train 0.8033 val 1.2166 acc 0.560 l1 0.1436 iou 0.480 lr 8.25e-04
+epoch 13 train 0.8274 val 0.8536 acc 0.640 l1 0.1168 iou 0.511 lr 7.94e-04
+epoch 14 train 0.8293 val 1.1380 acc 0.480 l1 0.1192 iou 0.514 lr 7.61e-04
+epoch 15 train 0.9144 val 1.1173 acc 0.560 l1 0.1259 iou 0.498 lr 7.27e-04
+epoch 16 train 0.8328 val 0.9450 acc 0.640 l1 0.1177 iou 0.518 lr 6.91e-04
+epoch 17 train 0.8125 val 1.1866 acc 0.600 l1 0.1185 iou 0.524 lr 6.55e-04
+epoch 18 train 0.7631 val 1.3440 acc 0.560 l1 0.1380 iou 0.480 lr 6.17e-04
+epoch 19 train 0.7258 val 1.0136 acc 0.600 l1 0.1215 iou 0.512 lr 5.78e-04
+epoch 20 train 0.7360 val 0.9369 acc 0.600 l1 0.1176 iou 0.512 lr 5.39e-04
+epoch 21 train 0.7250 val 1.0105 acc 0.680 l1 0.1227 iou 0.502 lr 5.00e-04
+early stopping at epoch 21
+fold 3: plain {'loss': 1.2279546386317204, 'acc': 0.42105263157894735, 'box_l1': 0.12122934272414759, 'iou': 0.5049718053717362} tta acc 0.421 (74s)
+epoch 1 train 1.1854 val 1.2256 acc 0.269 l1 0.1470 iou 0.393 lr 1.00e-03
+epoch 2 train 1.1112 val 1.0535 acc 0.385 l1 0.1566 iou 0.408 lr 9.98e-04
+epoch 3 train 0.9708 val 0.9842 acc 0.615 l1 0.1559 iou 0.411 lr 9.94e-04
+epoch 4 train 0.9873 val 1.0281 acc 0.462 l1 0.1562 iou 0.413 lr 9.86e-04
+epoch 5 train 0.9135 val 0.9030 acc 0.808 l1 0.1530 iou 0.416 lr 9.76e-04
+epoch 6 train 0.9078 val 0.9478 acc 0.462 l1 0.1481 iou 0.428 lr 9.62e-04
+epoch 7 train 0.8559 val 0.9400 acc 0.654 l1 0.1518 iou 0.424 lr 9.46e-04
+epoch 8 train 0.8219 val 0.8929 acc 0.654 l1 0.1533 iou 0.421 lr 9.26e-04
+epoch 9 train 0.9012 val 0.9256 acc 0.577 l1 0.1465 iou 0.434 lr 9.05e-04
+epoch 10 train 0.8788 val 1.4072 acc 0.577 l1 0.1615 iou 0.420 lr 8.80e-04
+epoch 11 train 0.8400 val 1.1233 acc 0.538 l1 0.1519 iou 0.423 lr 8.54e-04
+epoch 12 train 0.8240 val 0.9926 acc 0.615 l1 0.1424 iou 0.448 lr 8.25e-04
+epoch 13 train 0.8173 val 0.9620 acc 0.615 l1 0.1400 iou 0.450 lr 7.94e-04
+epoch 14 train 0.7591 val 0.9289 acc 0.615 l1 0.1375 iou 0.442 lr 7.61e-04
+epoch 15 train 0.7797 val 1.0926 acc 0.500 l1 0.1496 iou 0.425 lr 7.27e-04
+epoch 16 train 0.7748 val 1.3037 acc 0.500 l1 0.1705 iou 0.396 lr 6.91e-04
+early stopping at epoch 16
+fold 4: plain {'loss': 1.0108318015148765, 'acc': 0.5, 'box_l1': 0.14745243285831652, 'iou': 0.4378608026002583} tta acc 0.500 (101s)
+plain {'acc': '0.463+-0.128', 'iou': '0.448+-0.042', 'box_l1': '0.138+-0.009'}
+tta {'acc': '0.463+-0.128', 'iou': '0.450+-0.041', 'box_l1': '0.136+-0.009'}

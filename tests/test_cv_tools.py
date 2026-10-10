@@ -53,3 +53,12 @@ def test_variants_forward_and_tta_shapes():
         model = train.CustomCNN(3, **kw).eval()
         logits, box = train.predict(model, x, tta=True)
         assert logits.shape == (2, 3) and box.shape == (2, 4)
+
+
+def test_early_stopping_ignores_epochs_before_floor(tmp_path):
+    m = torch.nn.Linear(1, 1)
+    es = train.EarlyStopping(patience=2, path=tmp_path / "b.pt", min_epoch=3)
+    assert not es.step(0.1, m) and not es.step(0.1, m)  # epochs 1-2 never become "best"
+    assert not (tmp_path / "b.pt").exists()
+    es.step(0.9, m)  # epoch 3 is the first allowed checkpoint
+    assert (tmp_path / "b.pt").exists() and es.best == 0.9

@@ -33,7 +33,9 @@ CLASSES = {
         "prompt": "a circuit board.",
     },
     "drone": {
-        "categories": ["Unmanned_aerial_vehicles", "DJI_Phantom", "Quadcopters"],
+        "categories": ["Unmanned_aerial_vehicles", "DJI_Phantom", "Quadcopters", "Multirotors",
+                       "DJI_Mavic", "DJI_drones", "Parrot_drones", "Military_drones",
+                       "Photographs_of_quadcopters", "Hexacopters", "Octocopters"],
         "prompt": "a drone.",
     },
 }
@@ -233,14 +235,15 @@ def load_models(device):
     return dino_proc, dino, sam_proc, sam
 
 
-def detect_boxes(image, prompt, dino_proc, dino, device):
+def detect_boxes(image, prompt, dino_proc, dino, device, box_thr=BOX_THRESHOLD,
+                 text_thr=TEXT_THRESHOLD):
     """Grounding DINO boxes (xyxy px) and scores for one PIL image and text prompt."""
     import torch
     inputs = dino_proc(images=image, text=prompt, return_tensors="pt").to(device)
     with torch.no_grad():
         out = dino(**inputs)
     res = dino_proc.post_process_grounded_object_detection(
-        out, inputs["input_ids"], threshold=BOX_THRESHOLD, text_threshold=TEXT_THRESHOLD,
+        out, inputs["input_ids"], threshold=box_thr, text_threshold=text_thr,
         target_sizes=[image.size[::-1]])[0]
     return res["boxes"].cpu().numpy(), res["scores"].cpu().numpy()
 
