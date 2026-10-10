@@ -1,4 +1,5 @@
 """Smoke tests for train.py using a fake loader (CPU, no data needed)."""
+import json
 import sys
 from pathlib import Path
 
@@ -35,7 +36,8 @@ def test_training_changes_params_and_logs(tmp_path):
     assert (tmp_path / "best.pt").exists()
     lines = (tmp_path / "metrics.jsonl").read_text().splitlines()
     assert len(lines) == 2
-    assert {"epoch", "train_loss", "val_loss", "val_acc", "val_box_l1", "lr"} <= set(eval(lines[0]))
+    keys = {"epoch", "train_loss", "val_loss", "val_acc", "val_box_l1", "lr"}
+    assert keys <= set(json.loads(lines[0]))
 
 
 def test_early_stopping_triggers(tmp_path):
@@ -49,5 +51,6 @@ def test_early_stopping_triggers(tmp_path):
 
 def test_early_stopping_in_loop(tmp_path):
     history = train.train(train.CustomCNN(3), fake_loader(), fake_loader(seed=1), epochs=50,
-                          lr=0.0, patience=2, run_dir=tmp_path, device=torch.device("cpu"))
+                          lr=0.0, patience=2, run_dir=tmp_path,
+                          device=torch.device("cpu"))
     assert len(history) < 50

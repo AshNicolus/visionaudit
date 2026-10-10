@@ -23,7 +23,7 @@ SYSTEM_PROMPT = (
 )
 
 
-# ---------- loading ----------
+# --- loading ---
 
 def load_coco(path):
     """Read a COCO JSON file into a dict."""
@@ -38,7 +38,7 @@ def load_metrics(path):
     return [json.loads(line) for line in p.read_text().splitlines() if line.strip()]
 
 
-# ---------- chunking ----------
+# --- chunking ---
 
 def _class_names(coco):
     return {c["id"]: c["name"] for c in coco.get("categories", [])}
@@ -104,7 +104,7 @@ def build_chunks(coco, metrics):
     return image_chunks(coco) + class_chunks(coco) + metric_chunks(metrics)
 
 
-# ---------- vector store ----------
+# --- vector store ---
 
 def make_embedder():
     """Local sentence-transformers embedding function for chromadb."""
@@ -116,11 +116,12 @@ def make_embedder():
 def ingest(coco, metrics, db_path=DEFAULT_DB, embedder=None, name="audit"):
     """Rebuild the persistent collection from the given data and return it."""
     import chromadb
+    from chromadb.errors import NotFoundError
 
     client = chromadb.PersistentClient(path=str(db_path))
     try:
         client.delete_collection(name)
-    except Exception:
+    except NotFoundError:  # collection did not exist yet
         pass
     col = client.create_collection(name, embedding_function=embedder or make_embedder())
     chunks = build_chunks(coco, metrics)
@@ -135,19 +136,21 @@ def ingest(coco, metrics, db_path=DEFAULT_DB, embedder=None, name="audit"):
 
 def retrieve(col, query, k=5):
     """Top-k chunk texts for a natural-language query."""
+    if col.count() == 0:
+        return []
     res = col.query(query_texts=[query], n_results=min(k, col.count()))
     return res["documents"][0]
 
 
-# ---------- tools (pure Python, no API key needed) ----------
+# --- tools (pure Python, no API key needed) ---
 
 def _image_sizes(coco):
     return {i["id"]: i["width"] * i["height"] for i in coco.get("images", [])}
 
 
-def find_small_boxes(coco, max_area_fraction=None, min_area_px=None, limit=20):
+def find_small_boxes(coco, max_area_fraction=None, max_area_px=None, limit=20):
     """Boxes below an area threshold: a fraction of the image, or absolute pixels."""
-    if max_area_fraction is None and min_area_px is None:
+    if max_area_fraction is None and max_area_px is None:
         max_area_fraction = 0.001
     sizes = _image_sizes(coco)
     names = _class_names(coco)
@@ -157,7 +160,7 @@ def find_small_boxes(coco, max_area_fraction=None, min_area_px=None, limit=20):
         frac = a["area"] / sizes[a["image_id"]]
         if max_area_fraction is not None and frac > max_area_fraction:
             continue
-        if min_area_px is not None and a["area"] > min_area_px:
+        if max_area_px is not None and a["area"] > max_area_px:
             continue
         hits.append({
             "annotation_id": a["id"],
@@ -190,7 +193,8 @@ def bbox_area_stats(coco):
     names = _class_names(coco)
     per = {}
     for a in coco.get("annotations", []):
-        per.setdefault(names.get(a["category_id"], "?"), []).append(a["area"] / sizes[a["image_id"]])
+        cls = names.get(a["category_id"], "?")
+        per.setdefault(cls, []).append(a["area"] / sizes[a["image_id"]])
 
     def summ(v):
         v = sorted(v)
@@ -206,26 +210,30 @@ TOOL_SCHEMAS = [
     {
         "name": "find_small_boxes",
         "description": "Find bounding boxes smaller than a threshold. Give max_area_fraction "
-                       "(fraction of image area, e.g. 0.001) or min_area_px (absolute pixels, "
+                       "(fraction of image area, e.g. 0.001) or max_area_px (absolute pixels, "
                        "boxes with area <= this value). Returns match count, per-class counts "
                        "and the smallest examples.",
         "input_schema": {
             "type": "object",
             "properties": {
-                "max_area_fraction": {"type": "number", "description": "e.g. 0.001 for 0.1% of the image"},
-                "min_area_px": {"type": "number", "description": "box area in pixels, inclusive upper bound"},
+                "max_area_fraction": {"type": "number",
+                                      "description": "e.g. 0.001 for 0.1% of the image"},
+                "max_area_px": {"type": "number",
+                                "description": "box area in pixels, inclusive upper bound"},
                 "limit": {"type": "integer", "description": "max examples to return"},
             },
         },
     },
     {
         "name": "class_balance",
-        "description": "Per-class annotation counts and the imbalance ratio (largest class / smallest non-empty class).",
+        "description": "Per-class annotation counts and the imbalance ratio "
+                       "(largest class / smallest non-empty class).",
         "input_schema": {"type": "object", "properties": {}},
     },
     {
         "name": "bbox_area_stats",
-        "description": "Min/median/mean/max box area as a fraction of image area, overall and per class.",
+        "description": "Min/median/mean/max box area as a fraction of image area, "
+                       "overall and per class.",
         "input_schema": {"type": "object", "properties": {}},
     },
 ]
@@ -242,12 +250,13 @@ def run_tool(coco, name, args):
     raise KeyError(name)
 
 
-# ---------- LLM loop ----------
+# --- LLM loop ---
 
 def get_client():
     """Anthropic client, or exit with a one-line message when no key is set."""
     if not os.environ.get("ANTHROPIC_API_KEY"):
-        sys.exit("ANTHROPIC_API_KEY is not set; --demo/--query need it (tools and retrieval work offline).")
+        sys.exit("ANTHROPIC_API_KEY is not set; --demo/--query need it "
+                 "(tools and retrieval work offline).")
     import anthropic
 
     return anthropic.Anthropic()
@@ -261,7 +270,8 @@ def execute_tool_use(coco, block, log):
     except Exception as exc:  # report to the model instead of crashing the loop
         content, is_error = f"{type(exc).__name__}: {exc}", True
     log(f"  [tool] {block.name}({json.dumps(block.input)}) -> {content[:300]}")
-    return {"type": "tool_result", "tool_use_id": block.id, "content": content, "is_error": is_error}
+    return {"type": "tool_result", "tool_use_id": block.id, "content": content,
+            "is_error": is_error}
 
 
 def answer(client, coco, col, question, k=5, log=print, model=MODEL):
@@ -292,9 +302,11 @@ DEMO_QUESTIONS = [
     ("Tool scenario 1: small boxes",
      "How many bounding boxes cover less than 0.1% of their image, and which classes are they in?"),
     ("Tool scenario 2: class imbalance",
-     "Is the dataset class-balanced? Give counts and the imbalance ratio, and say what it means for training."),
+     "Is the dataset class-balanced? Give counts and the imbalance ratio, "
+     "and say what it means for training."),
     ("Pure RAG: training metrics",
-     "How did validation loss and accuracy change across epochs, and is there any sign of overfitting?"),
+     "How did validation loss and accuracy change across epochs, "
+     "and is there any sign of overfitting?"),
 ]
 
 
@@ -305,7 +317,7 @@ def run_demo(client, coco, col, log=print):
         log("A: " + answer(client, coco, col, q, log=log))
 
 
-# ---------- CLI ----------
+# --- CLI ---
 
 def parse_args(argv=None):
     p = argparse.ArgumentParser(description=__doc__)

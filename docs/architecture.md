@@ -1,4 +1,4 @@
-- Six 3x3 conv layers (stride-2 downsampling, 32 to 256 channels), each with BatchNorm and ReLU: small enough to train from scratch on a few hundred images, deep enough for a ~100px receptive field.
+- Six 3x3 conv layers (stride-2 downsampling, 32 to 256 channels), each with BatchNorm and ReLU: small enough to train from scratch on a few hundred images, deep enough for a 47px receptive field.
 - 3x3 kernels only: stacked small kernels give a larger receptive field with fewer parameters than one large kernel.
 - One hand-written residual block (identity skip) at 64 channels keeps gradients flowing and speeds early convergence.
 - Global average pooling feeds both heads, so the model works at any input size and has no large flatten layer to overfit.
