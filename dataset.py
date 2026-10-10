@@ -121,21 +121,6 @@ def random_affine_matrix(size, rng, max_rot=20, scale_range=(0.8, 1.2), max_shif
     )
 
 
-def color_jitter(img, rng, brightness=0.3, contrast=0.3, saturation=0.3, hue=8, blur_p=0.3):
-    """Photometric jitter on a BGR uint8 image; geometry is untouched so boxes stay valid."""
-    out = img.astype(np.float32)
-    out = out * rng.uniform(1 - contrast, 1 + contrast) + 255 * rng.uniform(-brightness, brightness) * 0.5
-    out = np.clip(out, 0, 255).astype(np.uint8)
-    hsv = cv2.cvtColor(out, cv2.COLOR_BGR2HSV).astype(np.float32)
-    hsv[..., 0] = (hsv[..., 0] + rng.uniform(-hue, hue)) % 180
-    hsv[..., 1] *= rng.uniform(1 - saturation, 1 + saturation)
-    out = cv2.cvtColor(np.clip(hsv, 0, [179, 255, 255]).astype(np.uint8), cv2.COLOR_HSV2BGR)
-    if rng.random() < blur_p:
-        k = int(rng.choice([3, 5]))
-        out = cv2.GaussianBlur(out, (k, k), 0)
-    return out
-
-
 # ---- preprocessing --------------------------------------------------------
 
 def normalize_image(img_bgr):
@@ -226,11 +211,10 @@ class CocoDataset(Dataset):
 
     def _augment(self, img, boxes, masks, labels):
         """Random affine; falls back to the input if no object survives."""
-        m = random_affine_matrix(self.size, self.rng, scale_range=(0.7, 1.3))
+        m = random_affine_matrix(self.size, self.rng)
         out_img, out_boxes, out_masks, keep = transform_sample(img, boxes, masks, m, self.size)
         if not keep:
             return img, boxes, masks, labels
-        out_img = color_jitter(out_img, self.rng)
         return out_img, out_boxes, out_masks, labels[keep]
 
     def __getitem__(self, idx):

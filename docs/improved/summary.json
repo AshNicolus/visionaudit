@@ -1,0 +1,15 @@
+{
+ "seed": 42,
+ "cmd": "python train.py --epochs 40 --patience 8",
+ "data": "190 images, 212 annotations",
+ "epochs_run": 25,
+ "best": {
+  "epoch": 17,
+  "train_loss": 0.9070180654525757,
+  "val_loss": 0.8502907031460812,
+  "val_acc": 0.6578947368421053,
+  "val_box_l1": 0.12178377415004529,
+  "val_iou": 0.5190941095352173,
+  "lr": 0.0006545084971874736
+ }
+}
