@@ -40,6 +40,8 @@ pytest -q
 - `validate_coco()` runs before the file is written.
 - Augmentation boxes are the bounding box of the four transformed corners, masks use nearest-neighbour warps. Tests check both against ground truth.
 
+Training baseline (v2, seeds 42/1/2, rebuildable with data hashes and commands): `docs/baseline_v2/`.
+
 Dataset: 190 images, 212 annotations (circuit_board 92, robot_arm 69, drone 51), split 152 train / 38 val. (The first version had 171 images; the scrape was extended to 80 per class.)
 
 ## Model
