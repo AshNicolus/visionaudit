@@ -15,7 +15,7 @@ META_PATH = os.path.join(ROOT, "data", "raw_meta.json")
 COCO_PATH = os.path.join(ROOT, "data", "coco", "annotations.json")
 
 COMMONS = "https://commons.wikimedia.org"
-USER_AGENT = "AugleAssessmentBot/0.1 (educational dataset project)"
+USER_AGENT = "VisionAuditBot/0.1 (educational dataset project)"
 DELAY_S = 0.7
 MAX_SIDE = 1600  # saved images are downscaled to this
 MIN_SIDE = 720  # smaller sources are rejected as not high-res
