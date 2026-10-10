@@ -1,0 +1,6 @@
+- Six 3x3 conv layers (stride-2 downsampling, 32 to 256 channels), each with BatchNorm and ReLU: small enough to train from scratch on a few hundred images, deep enough for a ~100px receptive field.
+- 3x3 kernels only: stacked small kernels give a larger receptive field with fewer parameters than one large kernel.
+- One hand-written residual block (identity skip) at 64 channels keeps gradients flowing and speeds early convergence.
+- Global average pooling feeds both heads, so the model works at any input size and has no large flatten layer to overfit.
+- Joint classification plus box regression (sigmoid-normalized cx, cy, w, h) uses the COCO labels already produced, and the box head forces features to localize the object rather than only recognize its texture.
+- Loss is CrossEntropy plus weighted SmoothL1; the box weight is up-scaled because box errors are small in normalized units.
