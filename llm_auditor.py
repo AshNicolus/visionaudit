@@ -252,8 +252,33 @@ def run_tool(coco, name, args):
 
 # --- LLM loop ---
 
-def get_client():
-    """Anthropic client, or exit with a one-line message when no key is set."""
+DEFAULT_OPENAI_MODEL = "Qwen/Qwen2.5-14B-Instruct"
+
+
+def openai_tools():
+    """TOOL_SCHEMAS in OpenAI chat.completions `tools` format."""
+    return [{"type": "function",
+             "function": {"name": t["name"], "description": t["description"],
+                          "parameters": t["input_schema"]}} for t in TOOL_SCHEMAS]
+
+
+def pick_backend(requested=None, env=None):
+    """Explicit choice wins; otherwise openai-compatible when LLM_BASE_URL is set."""
+    env = os.environ if env is None else env
+    return requested or ("openai" if env.get("LLM_BASE_URL") else "anthropic")
+
+
+def get_client(backend="anthropic"):
+    """Client for the backend, or exit with a one-line message when config is missing."""
+    if backend == "openai":
+        base = os.environ.get("LLM_BASE_URL")
+        if not base:
+            sys.exit("LLM_BASE_URL is not set; --backend openai needs it "
+                     "(also LLM_API_KEY, optional LLM_MODEL).")
+        import openai
+
+        # vLLM without --api-key accepts anything, so a missing key is not fatal
+        return openai.OpenAI(base_url=base, api_key=os.environ.get("LLM_API_KEY") or "none")
     if not os.environ.get("ANTHROPIC_API_KEY"):
         sys.exit("ANTHROPIC_API_KEY is not set; --demo/--query need it "
                  "(tools and retrieval work offline).")
@@ -262,25 +287,57 @@ def get_client():
     return anthropic.Anthropic()
 
 
-def execute_tool_use(coco, block, log):
-    """Run one tool_use block and build its tool_result block."""
+def call_tool(coco, name, args, log):
+    """Run a tool, returning (text, is_error); errors go back to the model, not the loop."""
     try:
-        out = run_tool(coco, block.name, block.input or {})
-        content, is_error = json.dumps(out), False
-    except Exception as exc:  # report to the model instead of crashing the loop
+        content, is_error = json.dumps(run_tool(coco, name, args)), False
+    except Exception as exc:
         content, is_error = f"{type(exc).__name__}: {exc}", True
-    log(f"  [tool] {block.name}({json.dumps(block.input)}) -> {content[:300]}")
+    log(f"  [tool] {name}({json.dumps(args)}) -> {content[:300]}")
+    return content, is_error
+
+
+def execute_tool_use(coco, block, log):
+    """Run one Anthropic tool_use block and build its tool_result block."""
+    content, is_error = call_tool(coco, block.name, block.input or {}, log)
     return {"type": "tool_result", "tool_use_id": block.id, "content": content,
             "is_error": is_error}
 
 
-def answer(client, coco, col, question, k=5, log=print, model=MODEL):
-    """Retrieve context, then run the tool-use loop until the model stops."""
+def parse_tool_args(raw):
+    """JSON-parse tool arguments; returns (args, error). Small models emit bad JSON."""
+    if raw is None or not str(raw).strip():
+        return {}, None
+    try:
+        args = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        return None, f"Invalid JSON arguments ({exc}). Send a valid JSON object and retry."
+    if not isinstance(args, dict):
+        return None, "Arguments must be a JSON object. Retry."
+    return args, None
+
+
+def execute_openai_call(coco, call, log):
+    """Run one OpenAI tool call and build its role=tool message."""
+    args, err = parse_tool_args(call.function.arguments)
+    if err:
+        log(f"  [tool] {call.function.name} bad arguments: {err}")
+        content = err
+    else:
+        content, _ = call_tool(coco, call.function.name, args, log)
+    return {"role": "tool", "tool_call_id": call.id, "content": content}
+
+
+def build_prompt(col, question, k, log):
+    """Retrieve context and build the user prompt (shared by both backends)."""
     context = retrieve(col, question, k) if col is not None else []
     log(f"  [retrieved {len(context)} chunks]")
     for c in context:
         log(f"    - {c}")
-    prompt = "Context:\n" + "\n".join(f"- {c}" for c in context) + f"\n\nQuestion: {question}"
+    return "Context:\n" + "\n".join(f"- {c}" for c in context) + f"\n\nQuestion: {question}"
+
+
+def answer_anthropic(client, coco, prompt, log, model):
     messages = [{"role": "user", "content": prompt}]
     for _ in range(MAX_TURNS):
         resp = client.messages.create(
@@ -298,6 +355,41 @@ def answer(client, coco, col, question, k=5, log=print, model=MODEL):
     return "Stopped: tool loop exceeded the turn limit."
 
 
+def answer_openai(client, coco, prompt, log, model):
+    messages = [{"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt}]
+    tools = openai_tools()
+    for _ in range(MAX_TURNS):
+        resp = client.chat.completions.create(
+            model=model, messages=messages, tools=tools, max_tokens=2048, temperature=0)
+        choice = resp.choices[0]
+        msg = choice.message
+        calls = msg.tool_calls or []
+        if calls:
+            messages.append({
+                "role": "assistant", "content": msg.content or "",
+                "tool_calls": [{"id": c.id, "type": "function",
+                                "function": {"name": c.function.name,
+                                             "arguments": c.function.arguments or "{}"}}
+                               for c in calls],
+            })
+            messages.extend(execute_openai_call(coco, c, log) for c in calls)
+            continue
+        if choice.finish_reason not in ("stop", None):
+            log(f"  [stopped: {choice.finish_reason}]")
+        return msg.content or ""
+    return "Stopped: tool loop exceeded the turn limit."
+
+
+def answer(client, coco, col, question, k=5, log=print, model=None, backend="anthropic"):
+    """Retrieve context, then run the tool loop for the chosen backend."""
+    prompt = build_prompt(col, question, k, log)
+    if backend == "openai":
+        model = model or os.environ.get("LLM_MODEL") or DEFAULT_OPENAI_MODEL
+        return answer_openai(client, coco, prompt, log, model)
+    return answer_anthropic(client, coco, prompt, log, model or MODEL)
+
+
 DEMO_QUESTIONS = [
     ("Tool scenario 1: small boxes",
      "How many bounding boxes cover less than 0.1% of their image, and which classes are they in?"),
@@ -310,11 +402,11 @@ DEMO_QUESTIONS = [
 ]
 
 
-def run_demo(client, coco, col, log=print):
+def run_demo(client, coco, col, log=print, backend="anthropic"):
     """Run the fixed demo questions."""
     for title, q in DEMO_QUESTIONS:
         log(f"\n=== {title} ===\nQ: {q}")
-        log("A: " + answer(client, coco, col, q, log=log))
+        log("A: " + answer(client, coco, col, q, log=log, backend=backend))
 
 
 # --- CLI ---
@@ -324,6 +416,8 @@ def parse_args(argv=None):
     p.add_argument("--coco", default=DEFAULT_COCO)
     p.add_argument("--metrics", default=DEFAULT_METRICS)
     p.add_argument("--db", default=DEFAULT_DB)
+    p.add_argument("--backend", choices=["anthropic", "openai"],
+                   help="default: openai if LLM_BASE_URL is set, else anthropic")
     p.add_argument("--demo", action="store_true", help="run the scripted demo")
     p.add_argument("--query", help="ask one question")
     p.add_argument("-k", type=int, default=5, help="chunks to retrieve")
@@ -334,13 +428,14 @@ def main(argv=None):
     args = parse_args(argv)
     if not (args.demo or args.query):
         sys.exit("Pass --demo or --query '...'.")
-    client = get_client()
+    backend = pick_backend(args.backend)
+    client = get_client(backend)
     coco = load_coco(args.coco)
     col = ingest(coco, load_metrics(args.metrics), args.db)
     if args.demo:
-        run_demo(client, coco, col)
+        run_demo(client, coco, col, backend=backend)
     else:
-        print(answer(client, coco, col, args.query, k=args.k))
+        print(answer(client, coco, col, args.query, k=args.k, backend=backend))
 
 
 if __name__ == "__main__":
