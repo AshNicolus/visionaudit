@@ -121,6 +121,31 @@ def random_affine_matrix(size, rng, max_rot=20, scale_range=(0.8, 1.2), max_shif
     )
 
 
+def _largest(boxes):
+    """Index of the largest xyxy box."""
+    return int(((boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])).argmax())
+
+
+def box_crop_matrix(size, box, rng, zoom=(1.2, 2.0), jitter=0.15, flip_p=0.5):
+    """Zoom in about the box centre, then shift the centre near the middle of the canvas.
+
+    Same 3x3 form as every other transform, so boxes and masks follow through
+    transform_sample; objects that end up mostly cropped out are dropped there.
+    """
+    cx, cy = (box[0] + box[2]) / 2, (box[1] + box[3]) / 2
+    s = rng.uniform(*zoom)
+    # keep the box inside the canvas when it fits, otherwise just zoom less
+    longest = max(box[2] - box[0], box[3] - box[1], 1.0)
+    s = min(s, 0.95 * size / longest)
+    s = max(s, 1.0)
+    tx = size / 2 + rng.uniform(-jitter, jitter) * size
+    ty = size / 2 + rng.uniform(-jitter, jitter) * size
+    m = np.array([[s, 0, tx - s * cx], [0, s, ty - s * cy], [0, 0, 1]], dtype=np.float64)
+    if rng.random() < flip_p:
+        m = np.array([[-1, 0, size], [0, 1, 0], [0, 0, 1]], dtype=np.float64) @ m
+    return m
+
+
 # ---- preprocessing --------------------------------------------------------
 
 def normalize_image(img_bgr):
@@ -180,12 +205,14 @@ def load_coco(ann_path):
 class CocoDataset(Dataset):
     """Returns the largest object per image: class, normalized cxcywh box and binary mask."""
 
-    def __init__(self, ann_path, img_dir, indices=None, img_size=224, train=False, seed=0):
+    def __init__(self, ann_path, img_dir, indices=None, img_size=224, train=False, seed=0,
+                 crop_prob=0.0):
         self.images, self.by_image, self.cat_index = load_coco(ann_path)
         if indices is not None:
             self.images = [self.images[i] for i in indices]
         self.img_dir, self.size, self.train = img_dir, img_size, train
         self.rng = np.random.default_rng(seed)
+        self.crop_prob = crop_prob  # chance of a zoom-in crop around the largest box
 
     def __len__(self):
         return len(self.images)
@@ -211,7 +238,10 @@ class CocoDataset(Dataset):
 
     def _augment(self, img, boxes, masks, labels):
         """Random affine; falls back to the input if no object survives."""
-        m = random_affine_matrix(self.size, self.rng)
+        if self.crop_prob and self.rng.random() < self.crop_prob:
+            m = box_crop_matrix(self.size, boxes[_largest(boxes)], self.rng)
+        else:
+            m = random_affine_matrix(self.size, self.rng)
         out_img, out_boxes, out_masks, keep = transform_sample(img, boxes, masks, m, self.size)
         if not keep:
             return img, boxes, masks, labels
@@ -222,8 +252,7 @@ class CocoDataset(Dataset):
         img, boxes, masks = letterbox_sample(img, boxes, masks, self.size)
         if self.train:
             img, boxes, masks, labels = self._augment(img, boxes, masks, labels)
-        areas = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
-        k = int(areas.argmax())
+        k = _largest(boxes)
         x1, y1, x2, y2 = boxes[k] / self.size
         box = np.array([(x1 + x2) / 2, (y1 + y2) / 2, x2 - x1, y2 - y1], dtype=np.float32)
         return {
@@ -242,11 +271,12 @@ def split_indices(n, val_split, seed):
 
 
 def get_dataloaders(ann_path="data/coco/annotations.json", img_dir="data/images",
-                    img_size=224, batch_size=16, val_split=0.2, seed=42):
+                    img_size=224, batch_size=16, val_split=0.2, seed=42, crop_prob=0.0):
     """Build (train_loader, val_loader, num_classes); only train is augmented."""
     n = len(load_coco(ann_path)[0])
     train_idx, val_idx = split_indices(n, val_split, seed)
-    train_ds = CocoDataset(ann_path, img_dir, train_idx, img_size, train=True, seed=seed)
+    train_ds = CocoDataset(ann_path, img_dir, train_idx, img_size, train=True, seed=seed,
+                          crop_prob=crop_prob)
     val_ds = CocoDataset(ann_path, img_dir, val_idx, img_size, train=False)
     gen = torch.Generator().manual_seed(seed)
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, generator=gen)
