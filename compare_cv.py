@@ -10,8 +10,22 @@ CV = Path(__file__).resolve().parent / "docs" / "cv"
 SIGN = {"acc": 1, "iou": 1, "box_l1": -1}
 
 
+# options a candidate may change; anything else must match the baseline exactly
+KNOBS = {"name", "ema", "crop_prob", "label_smoothing", "weight_decay", "warmup", "width",
+         "deep", "tb", "out_dir", "ann_path", "meta_path", "img_dir"}
+
+
 def load(name):
-    return json.loads((CV / f"{name}.json").read_text())
+    path = Path(name) if name.endswith(".json") else CV / f"{name}.json"
+    return json.loads(path.read_text())
+
+
+def check_comparable(base, cand):
+    """Refuse to pair runs that differ in folds, seeds, schedule or data."""
+    a, b = base["args"], cand["args"]
+    bad = {k: (a.get(k), b.get(k)) for k in (a.keys() | b.keys()) - KNOBS if a.get(k) != b.get(k)}
+    if bad:
+        raise SystemExit(f"not comparable ({base['name']} vs {cand['name']}): {bad}")
 
 
 def compare(base, cand, mode="plain"):
@@ -30,6 +44,7 @@ def main(base_name, names):
         print(f"== {mode} vs {base_name}")
         for n in names:
             cand = load(n)
+            check_comparable(base, cand)
             s = cand[mode]
             print(f"{n}: " + " ".join(f"{k} {v['mean']:.3f}+-{v['std']:.3f}" for k, v in s.items()))
             for m, d, mean, std, verdict in compare(base, cand, mode):

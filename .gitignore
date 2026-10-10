@@ -8,3 +8,4 @@ chroma_db/
 .pytest_cache/
 runs_*.log
 relabel.log
+scrape.log

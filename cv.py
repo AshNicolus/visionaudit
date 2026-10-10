@@ -6,6 +6,7 @@ stopping and best-checkpoint choice; the held-out fold is only scored once, with
 weights. Same rule for every config, so runs are paired fold by fold.
 """
 import argparse
+import hashlib
 import json
 import time
 from pathlib import Path
@@ -126,7 +127,8 @@ def main(argv=None):
         plain = {m: round(v, 3) for m, v in r["plain"].items()}
         print(f"fold {k}: plain {plain} tta acc {r['tta']['acc']:.3f} "
               f"best_ep {r['best_epochs']} ({time.time() - t0:.0f}s)", flush=True)
-    out = {"name": args.name, "args": vars(args), "folds": results,
+    meta = vars(args) | {"ann_sha256": hashlib.sha256(Path(args.ann_path).read_bytes()).hexdigest()}
+    out = {"name": args.name, "args": meta, "folds": results,
            "plain": summarize(results, "plain"), "tta": summarize(results, "tta")}
     Path(args.out_dir).mkdir(parents=True, exist_ok=True)
     with open(Path(args.out_dir) / f"{args.name}.json", "w") as f:
