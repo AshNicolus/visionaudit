@@ -1,6 +1,8 @@
-# Augle AI Intern Assignment
+# VisionAudit
 
-Scrape, auto-label, train and audit an image dataset end to end. Classes: robot arm, circuit board, drone.
+Image data pipeline: scrape, auto-label, train a custom CNN and audit the dataset with an LLM.
+
+Classes: robot arm, circuit board, drone.
 
 ## Setup
 
