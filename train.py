@@ -10,8 +10,9 @@ import torch
 from torch import nn
 from torch.utils.tensorboard import SummaryWriter
 
-MEAN = (0.485, 0.456, 0.406)
-STD = (0.229, 0.224, 0.225)
+from dataset import MEAN, STD
+
+HERE = Path(__file__).resolve().parent
 
 
 def conv_bn(c_in, c_out, stride=1):
@@ -71,7 +72,8 @@ class DetectionLoss(nn.Module):
         self.l1 = nn.SmoothL1Loss()
 
     def forward(self, logits, boxes, labels, target_boxes):
-        return self.cls_weight * self.ce(logits, labels) + self.box_weight * self.l1(boxes, target_boxes)
+        cls_loss = self.ce(logits, labels)
+        return self.cls_weight * cls_loss + self.box_weight * self.l1(boxes, target_boxes)
 
 
 class EarlyStopping:
@@ -117,10 +119,12 @@ def get_device():
 
 
 def train_one_epoch(model, loader, criterion, optimizer, device):
-    """One pass over the training data; returns mean loss."""
+    """One pass over the training data; returns (mean loss, first batch used)."""
     model.train()
-    total, count = 0.0, 0
+    total, count, first = 0.0, 0, None
     for batch in loader:
+        if first is None:
+            first = batch
         images = batch["image"].to(device)
         labels = batch["label"].to(device)
         boxes = batch["box"].to(device)
@@ -131,7 +135,7 @@ def train_one_epoch(model, loader, criterion, optimizer, device):
         optimizer.step()
         total += loss.item() * images.size(0)
         count += images.size(0)
-    return total / max(count, 1)
+    return total / max(count, 1), first
 
 
 def evaluate(model, loader, criterion, device):
@@ -166,9 +170,8 @@ def draw_box_sample(image, box):
     return img.transpose(2, 0, 1)
 
 
-def log_samples(writer, loader, epoch, n=4):
-    """Write n augmented training samples with their boxes to TensorBoard."""
-    batch = next(iter(loader))
+def log_samples(writer, batch, epoch, n=4):
+    """Write n augmented samples from a batch the epoch already used."""
     for i in range(min(n, batch["image"].size(0))):
         writer.add_image(f"samples/{i}", draw_box_sample(batch["image"][i], batch["box"][i]), epoch)
 
@@ -196,7 +199,7 @@ def train(model, train_loader, val_loader, epochs=30, lr=1e-3, patience=5, seed=
     writer = SummaryWriter(str(run_dir / "tb"))
     history = []
     for epoch in range(1, epochs + 1):
-        train_loss = train_one_epoch(model, train_loader, criterion, optimizer, device)
+        train_loss, first_batch = train_one_epoch(model, train_loader, criterion, optimizer, device)
         val_loss, val_acc, val_l1 = evaluate(model, val_loader, criterion, device)
         current_lr = optimizer.param_groups[0]["lr"]
         scheduler.step()
@@ -208,13 +211,15 @@ def train(model, train_loader, val_loader, epochs=30, lr=1e-3, patience=5, seed=
         writer.add_scalar("val/acc", val_acc, epoch)
         writer.add_scalar("val/box_l1", val_l1, epoch)
         writer.add_scalar("lr", current_lr, epoch)
-        log_samples(writer, train_loader, epoch)
+        log_samples(writer, first_batch, epoch)
         print(f"epoch {epoch} train {train_loss:.4f} val {val_loss:.4f} acc {val_acc:.3f} "
               f"l1 {val_l1:.4f} lr {current_lr:.2e}")
         if stopper.step(val_loss, model):
             print(f"early stopping at epoch {epoch}")
             break
     writer.close()
+    if stopper.path.exists():  # return the best weights, not the last
+        model.load_state_dict(torch.load(stopper.path, map_location=device))
     return history
 
 
@@ -226,6 +231,8 @@ def parse_args(argv=None):
     p.add_argument("--img-size", type=int, default=224)
     p.add_argument("--patience", type=int, default=5)
     p.add_argument("--seed", type=int, default=42)
+    p.add_argument("--ann-path", default=str(HERE / "data/coco/annotations.json"))
+    p.add_argument("--img-dir", default=str(HERE / "data/images"))
     return p.parse_args(argv)
 
 
@@ -234,6 +241,7 @@ def main(argv=None):
     from dataset import get_dataloaders
 
     train_loader, val_loader, num_classes = get_dataloaders(
+        ann_path=args.ann_path, img_dir=args.img_dir,
         img_size=args.img_size, batch_size=args.batch_size, seed=args.seed)
     set_seed(args.seed)
     model = CustomCNN(num_classes)

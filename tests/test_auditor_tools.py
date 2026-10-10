@@ -28,6 +28,9 @@ def metrics():
 class HashEmbedder(EmbeddingFunction):
     """Deterministic bag-of-words embedding so tests need no model download."""
 
+    def __init__(self):
+        pass
+
     def __call__(self, input):
         out = []
         for text in input:
@@ -41,6 +44,13 @@ class HashEmbedder(EmbeddingFunction):
     def name():
         return "hash-test"
 
+    def get_config(self):
+        return {}
+
+    @staticmethod
+    def build_from_config(config):
+        return HashEmbedder()
+
 
 def test_find_small_boxes_fraction(coco):
     res = la.find_small_boxes(coco, max_area_fraction=0.001)
@@ -50,13 +60,14 @@ def test_find_small_boxes_fraction(coco):
 
 
 def test_find_small_boxes_pixels_and_default(coco):
-    assert la.find_small_boxes(coco, min_area_px=64)["total_matches"] == 3
+    assert la.find_small_boxes(coco, max_area_px=64)["total_matches"] == 3
     assert la.find_small_boxes(coco)["total_matches"] == 2
 
 
 def test_class_balance(coco):
     res = la.class_balance_from(coco)
-    assert [(r["name"], r["count"]) for r in res["classes"]] == [("cat", 12), ("dog", 5), ("bird", 1)]
+    rows = [(r["name"], r["count"]) for r in res["classes"]]
+    assert rows == [("cat", 12), ("dog", 5), ("bird", 1)]
     assert res["imbalance_ratio"] == 12.0
     assert res["classes_with_no_boxes"] == []
 
