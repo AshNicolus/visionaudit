@@ -1,0 +1,336 @@
+{
+ "reviewed": "contact sheet by eye, low-res; wrong-object boxes dropped (drone-shot aerial scenes, people, rifles, whole factory floors)",
+ "dropped": [
+  "circuit_board_0032.jpg",
+  "circuit_board_0063.jpg",
+  "drone_0014.jpg",
+  "drone_0016.jpg",
+  "drone_0022.jpg",
+  "drone_0028.jpg",
+  "drone_0031.jpg",
+  "drone_0032.jpg",
+  "drone_0033.jpg",
+  "drone_0040.jpg",
+  "drone_0043.jpg",
+  "drone_0044.jpg",
+  "drone_0051.jpg",
+  "drone_0063.jpg",
+  "drone_0064.jpg",
+  "drone_0068.jpg",
+  "drone_0069.jpg",
+  "drone_0077.jpg",
+  "drone_0078.jpg",
+  "drone_0083.jpg",
+  "robot_arm_0016.jpg",
+  "robot_arm_0034.jpg",
+  "robot_arm_0049.jpg",
+  "robot_arm_0054.jpg",
+  "robot_arm_0075.jpg"
+ ],
+ "labelled": [
+  {
+   "file": "robot_arm_0006.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 2,
+   "kept": true
+  },
+  {
+   "file": "robot_arm_0015.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 2,
+   "kept": true
+  },
+  {
+   "file": "robot_arm_0016.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 3,
+   "kept": false
+  },
+  {
+   "file": "robot_arm_0023.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 3,
+   "kept": true
+  },
+  {
+   "file": "robot_arm_0025.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": true
+  },
+  {
+   "file": "robot_arm_0034.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 2,
+   "kept": false
+  },
+  {
+   "file": "robot_arm_0035.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 2,
+   "kept": true
+  },
+  {
+   "file": "robot_arm_0045.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 2,
+   "kept": true
+  },
+  {
+   "file": "robot_arm_0049.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "robot_arm_0054.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 3,
+   "kept": false
+  },
+  {
+   "file": "robot_arm_0057.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 2,
+   "kept": true
+  },
+  {
+   "file": "robot_arm_0064.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 2,
+   "kept": true
+  },
+  {
+   "file": "circuit_board_0032.jpg",
+   "prompt": "a printed circuit board.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "circuit_board_0037.jpg",
+   "prompt": "a printed circuit board.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 4,
+   "kept": true
+  },
+  {
+   "file": "drone_0014.jpg",
+   "prompt": "a drone. a quadcopter.",
+   "box_thr": 0.2,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0016.jpg",
+   "prompt": "an unmanned aerial vehicle.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0022.jpg",
+   "prompt": "an unmanned aerial vehicle.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0026.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": true
+  },
+  {
+   "file": "drone_0028.jpg",
+   "prompt": "a quadcopter.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0031.jpg",
+   "prompt": "an unmanned aerial vehicle.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0032.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0033.jpg",
+   "prompt": "a quadcopter.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0040.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0043.jpg",
+   "prompt": "an unmanned aerial vehicle.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0044.jpg",
+   "prompt": "a quadcopter.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0051.jpg",
+   "prompt": "an unmanned aerial vehicle.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "circuit_board_0063.jpg",
+   "prompt": "a printed circuit board.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 2,
+   "kept": false
+  },
+  {
+   "file": "drone_0063.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0064.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0066.jpg",
+   "prompt": "a drone. a quadcopter.",
+   "box_thr": 0.2,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": true
+  },
+  {
+   "file": "drone_0067.jpg",
+   "prompt": "a drone. a quadcopter.",
+   "box_thr": 0.2,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": true
+  },
+  {
+   "file": "drone_0068.jpg",
+   "prompt": "an unmanned aerial vehicle.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0069.jpg",
+   "prompt": "an unmanned aerial vehicle.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "robot_arm_0075.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 3,
+   "kept": false
+  },
+  {
+   "file": "robot_arm_0077.jpg",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": true
+  },
+  {
+   "file": "drone_0077.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0078.jpg",
+   "prompt": "an unmanned aerial vehicle.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1,
+   "kept": false
+  },
+  {
+   "file": "drone_0083.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 2,
+   "kept": false
+  }
+ ]
+}

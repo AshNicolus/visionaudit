@@ -6,3 +6,6 @@ runs/
 chroma_db/
 .env
 .pytest_cache/
+runs_*.log
+relabel.log
+scrape.log

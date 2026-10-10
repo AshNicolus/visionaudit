@@ -158,3 +158,16 @@ def test_letterbox_mask_matches_box():
     box = np.array([[40, 20, 120, 60]], np.float32)
     _, b, mk = ds.letterbox_sample(img, box, mask, 100)
     assert np.abs(mask_bbox(mk[0]) - b[0]).max() <= 1
+
+
+def test_box_crop_keeps_box_and_mask_consistent():
+    img, boxes, masks = make_sample()
+    rng = np.random.default_rng(0)
+    for _ in range(50):
+        m = ds.box_crop_matrix(SIZE, boxes[0], rng)
+        _, b, mk, keep = ds.transform_sample(img, boxes, masks, m, SIZE)
+        assert keep == [0]
+        assert b.min() >= 0 and b.max() <= SIZE
+        assert np.abs(mask_bbox(mk[0]) - b[0]).max() <= 1  # fractional scale: within a pixel
+        # zooming in: the box is never smaller than the original
+        assert (b[0, 2] - b[0, 0]) >= (boxes[0, 2] - boxes[0, 0]) - 1
