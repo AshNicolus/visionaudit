@@ -48,16 +48,10 @@ Shipped set: 201 images, 228 annotations (circuit_board 92, robot_arm 80, drone 
 `docs/data_v4/annotations_v4_clean.json`, sha256 `3ce6fb6d4fba8bf04edcc35eca52b2725971be7a4d7390a7c47ebbe6b007de01`.
 `train.py` with seed 42 splits it 161 train / 40 val.
 
-Rebuild, in order (the scrape is not deterministic, so images can differ; the committed JSON is the reference):
-
-```bash
-python collect_and_annotate.py                      # data/coco/annotations.json (v2: 190 images)
-python scrape_more.py --cls drone                   # more drone images
-python relabel_missed.py --src data/coco/annotations_v2.json --out data/coco/annotations_v3.json   # extra prompts for misses
-# v4 = docs/data_v4/annotations.json (sha d2acad01...); clean = v4 minus the 8 images dropped in docs/data_v4/review.json
-cp docs/data_v4/annotations_v4_clean.json data/coco/
-sha256sum data/coco/annotations_v4_clean.json
-```
+The scrape is not deterministic, so a fresh run gives different images. The reference dataset is the committed
+`docs/data_v4/annotations_v4_clean.json` (sha256 in `docs/data_v4/review.json`). To use it, copy it to
+`data/coco/annotations_v4_clean.json` and point `--ann-path` at it. The images are fetched with
+`collect_and_annotate.py`, `scrape_more.py` and `relabel_missed.py`; the exact flags used for the extra drone images were not recorded.
 
 I reviewed 19 relabelled images by eye on contact sheets and dropped 8 of them (`docs/data_v4/review.json`).
 The remaining Grounding DINO + SAM labels have not been reviewed.
