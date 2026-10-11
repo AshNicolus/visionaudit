@@ -126,7 +126,7 @@ python llm_auditor.py --backend anthropic --demo | tee docs/demo_output.txt
 It also runs against a self-hosted vLLM server (OpenAI-compatible, `Qwen/Qwen2.5-14B-Instruct`, started with `--enable-auto-tool-choice --tool-call-parser hermes`). `--backend openai` is the default when `LLM_BASE_URL` is set. Config comes from env vars only; the model may emit invalid tool-call JSON, which is sent back as the tool result so it can retry.
 
 ```bash
-ssh -p 31319 -L 20001:localhost:20001 ubuntu@117.18.102.47 -N   # keep open in another terminal
+ssh -p <port> -L 20001:localhost:20001 <user>@<host> -N   # keep open in another terminal
 export LLM_BASE_URL=http://localhost:20001/v1 LLM_API_KEY=... LLM_MODEL=Qwen/Qwen2.5-14B-Instruct
 python llm_auditor.py --backend openai --demo | tee docs/demo_output.txt
 ```
