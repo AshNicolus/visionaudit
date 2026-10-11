@@ -28,6 +28,7 @@ def license_ok(name):
     """Open licence with no NonCommercial / NoDerivs clause."""
     return bool(LICENSE_OK.search(name)) and not LICENSE_BAD.search(name)
 
+
 # class name -> Commons categories to crawl and the Grounding DINO text prompt
 CLASSES = {
     "robot_arm": {

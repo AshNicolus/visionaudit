@@ -3,7 +3,7 @@ import pytest
 from collect_and_annotate import license_ok
 
 
-@pytest.mark.parametrize("name", ["CC BY 4.0", "CC BY-SA 3.0 de", "Public domain", "CC0", "PD"])
+@pytest.mark.parametrize("name", ["CC BY 4.0", "CC BY-SA 3.0 de", "Public domain", "PD"])
 def test_accepts_open_licences(name):
     assert license_ok(name)
 

@@ -6,6 +6,8 @@ groups.DHASH_MAX of one (existing images and ones added in this run).
 import argparse
 import hashlib
 import os
+import re
+import urllib.parse
 
 import collect_and_annotate as C
 from groups import DHASH_MAX, dhash, hash_distance
@@ -20,6 +22,12 @@ EXTRA_CATS = {
 }
 
 
+# page titles of people, logos and other off-class shots
+SKIP_TITLE = re.compile(r"portrait|logo|speaks?\b|interview|conference|"
+                        r"\bmeeting\b|ceremony|visit|award|minister|president|CEO|staff|"
+                        r"student|crowd|forum|summit|exhibition|fair\b|\bWEF\b", re.I)
+
+
 def sha(path):
     with open(path, "rb") as f:
         return hashlib.sha256(f.read()).hexdigest()
@@ -32,10 +40,18 @@ def install_dedupe():
         p = os.path.join(C.IMG_DIR, n)
         seen[n] = (sha(p), dhash(p))
     orig = C._download_one
+    skipped = []
+
+    def guarded(page, request, cls, fpage):
+        title = urllib.parse.unquote(fpage.rsplit("File:", 1)[-1])
+        if SKIP_TITLE.search(title):
+            skipped.append(title)
+            return None
+        return orig(page, request, cls, fpage)
     stats = {"sha": 0, "dhash": 0}
 
     def wrapped(page, request, cls, fpage):
-        rec = orig(page, request, cls, fpage)
+        rec = guarded(page, request, cls, fpage)
         if rec is None:
             return None
         p = os.path.join(C.IMG_DIR, rec["file_name"])
