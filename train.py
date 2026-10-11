@@ -298,8 +298,14 @@ def train(model, train_loader, val_loader, epochs=30, lr=1e-3, patience=5, seed=
     return history
 
 
+# the CV winner (docs/experiments.md): EMA plus box-crop, 40 epochs, patience 8, floor 5
+EMA_CROP = {"ema": 0.99, "crop_prob": 0.5, "epochs": 40, "patience": 8, "min_epoch": 5}
+
+
 def parse_args(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--preset", choices=["ema_crop"],
+                   help="CV-winning recipe; explicit flags still override it")
     p.add_argument("--epochs", type=int, default=30)
     p.add_argument("--lr", type=float, default=1e-3)
     p.add_argument("--batch-size", type=int, default=16)
@@ -317,6 +323,9 @@ def parse_args(argv=None):
     p.add_argument("--run-dir", default=str(HERE / "runs"))
     p.add_argument("--ann-path", default=str(HERE / "data/coco/annotations.json"))
     p.add_argument("--img-dir", default=str(HERE / "data/images"))
+    pre, _ = p.parse_known_args(argv)
+    if pre.preset == "ema_crop":
+        p.set_defaults(**EMA_CROP)
     return p.parse_args(argv)
 
 

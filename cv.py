@@ -69,7 +69,9 @@ def run_fold(k, split, args, rep=0):
     for tta in (False, True):
         loss, acc, l1, iou = T.evaluate(model, te_loader, crit, dev, tta=tta)
         out["tta" if tta else "plain"] = {"loss": loss, "acc": acc, "box_l1": l1, "iou": iou}
-    best = min(hist, key=lambda r: r["val_loss"])
+    # the weights come from the floor-respecting checkpoint, so report that epoch
+    best = min((r for r in hist if r["epoch"] >= args.min_epoch) or hist,
+               key=lambda r: r["val_loss"])
     return {"seed_rep": rep, "n_train": len(tr), "n_inner_val": len(val), "n_test": len(te),
             "epochs_run": len(hist), "best_epoch": best["epoch"], **out}
 

@@ -54,3 +54,11 @@ def test_early_stopping_in_loop(tmp_path):
                           lr=0.0, patience=2, run_dir=tmp_path,
                           device=torch.device("cpu"))
     assert len(history) < 50
+
+
+def test_preset_sets_recipe_and_defaults_stay():
+    a = train.parse_args(["--preset", "ema_crop"])
+    assert (a.ema, a.crop_prob, a.min_epoch, a.epochs) == (0.99, 0.5, 5, 40)
+    assert train.parse_args(["--preset", "ema_crop", "--ema", "0.9"]).ema == 0.9
+    d = train.parse_args([])
+    assert (d.ema, d.crop_prob, d.min_epoch, d.epochs) == (0.0, 0.0, 1, 30)

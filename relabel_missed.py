@@ -14,7 +14,7 @@ import collect_and_annotate as C
 
 # (prompt, box threshold, text threshold), tried in order; first with a detection wins
 EXTRA = {
-    "drone": [("a drone.", 0.25, 0.20), ("a quadcopter.", 0.25, 0.20),
+    "drone": [("a drone.", 0.35, 0.25), ("a drone.", 0.25, 0.20), ("a quadcopter.", 0.25, 0.20),
               ("an unmanned aerial vehicle.", 0.25, 0.20), ("a drone. a quadcopter.", 0.20, 0.20)],
     "robot_arm": [("a robotic arm.", 0.25, 0.20), ("an industrial robot.", 0.25, 0.20)],
     "circuit_board": [("a printed circuit board.", 0.25, 0.20)],
@@ -26,11 +26,14 @@ def main():
     ap.add_argument("--min-score", type=float, default=0.0)
     ap.add_argument("--src", default="data/coco/annotations_v2.json")
     ap.add_argument("--out", default="data/coco/annotations_v3.json")
+    ap.add_argument("--skip-meta", help="meta file; its images are not retried")
     ap.add_argument("--log", default="docs/relabel_log.json")
     args = ap.parse_args()
     meta = json.load(open(C.META_PATH))
     coco = json.load(open(args.src))
     have = {im["file_name"] for im in coco["images"]}
+    if args.skip_meta:
+        have |= {r["file_name"] for r in json.load(open(args.skip_meta))}
     cat_ids = {c["name"]: c["id"] for c in coco["categories"]}
     device = C.pick_device()
     dino_proc, dino, sam_proc, sam = C.load_models(device)

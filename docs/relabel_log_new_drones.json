@@ -1,0 +1,105 @@
+{
+ "dropped": [
+  "drone_0091.jpg",
+  "drone_0092.jpg",
+  "drone_0095.jpg",
+  "drone_0099.jpg",
+  "drone_0100.jpg",
+  "drone_0102.jpg",
+  "drone_0103.jpg"
+ ],
+ "labelled": [
+  {
+   "file": "drone_0088.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.35,
+   "text_thr": 0.25,
+   "objects": 1
+  },
+  {
+   "file": "drone_0090.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.35,
+   "text_thr": 0.25,
+   "objects": 1
+  },
+  {
+   "file": "drone_0091.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.35,
+   "text_thr": 0.25,
+   "objects": 1
+  },
+  {
+   "file": "drone_0092.jpg",
+   "prompt": "an unmanned aerial vehicle.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 2
+  },
+  {
+   "file": "drone_0095.jpg",
+   "prompt": "a quadcopter.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1
+  },
+  {
+   "file": "drone_0099.jpg",
+   "prompt": "an unmanned aerial vehicle.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1
+  },
+  {
+   "file": "drone_0100.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.35,
+   "text_thr": 0.25,
+   "objects": 1
+  },
+  {
+   "file": "drone_0101.jpg",
+   "prompt": "a drone. a quadcopter.",
+   "box_thr": 0.2,
+   "text_thr": 0.2,
+   "objects": 1
+  },
+  {
+   "file": "drone_0102.jpg",
+   "prompt": "a quadcopter.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 1
+  },
+  {
+   "file": "drone_0103.jpg",
+   "prompt": "a quadcopter.",
+   "box_thr": 0.25,
+   "text_thr": 0.2,
+   "objects": 2
+  },
+  {
+   "file": "drone_0104.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.35,
+   "text_thr": 0.25,
+   "objects": 1
+  },
+  {
+   "file": "drone_0105.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.35,
+   "text_thr": 0.25,
+   "objects": 1
+  },
+  {
+   "file": "drone_0106.jpg",
+   "prompt": "a drone.",
+   "box_thr": 0.35,
+   "text_thr": 0.25,
+   "objects": 1
+  }
+ ],
+ "note": "contact-sheet review by eye; dropped people, scenery, charts, cars"
+}
