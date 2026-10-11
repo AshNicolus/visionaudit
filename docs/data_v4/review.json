@@ -1,0 +1,104 @@
+{
+ "note": "19 labelled images reviewed (6 kept new drones + 13 kept earlier relabels) on legible contact sheets; 7 new drones already dropped in relabel_log_new_drones.json and absent. Dropped images are removed whole from the clean file.",
+ "clean_file": "docs/data_v4/annotations_v4_clean.json",
+ "sha256": "3ce6fb6d4fba8bf04edcc35eca52b2725971be7a4d7390a7c47ebbe6b007de01",
+ "images": 201,
+ "annotations": 228,
+ "reviews": [
+  {
+   "file": "drone_0090.jpg",
+   "verdict": "drop",
+   "reason": "mask/box includes bystanders and a large manned air-taxi cabin, not a drone"
+  },
+  {
+   "file": "drone_0104.jpg",
+   "verdict": "drop",
+   "reason": "manned eVTOL concept display, not drone-like; mask bleeds into scene"
+  },
+  {
+   "file": "drone_0105.jpg",
+   "verdict": "drop",
+   "reason": "manned eVTOL concept display, not drone-like; people inside mask"
+  },
+  {
+   "file": "robot_arm_0006.jpg",
+   "verdict": "drop",
+   "reason": "one annotation covers the whole frame; only the gripper box is right, so image dropped"
+  },
+  {
+   "file": "robot_arm_0015.jpg",
+   "verdict": "drop",
+   "reason": "one annotation covers the whole conveyor scene; image dropped"
+  },
+  {
+   "file": "robot_arm_0035.jpg",
+   "verdict": "drop",
+   "reason": "red box is on a non-robot part (wheel/guard), arm boxes overlap inconsistently"
+  },
+  {
+   "file": "circuit_board_0037.jpg",
+   "verdict": "drop",
+   "reason": "annotations are LED panels plus a whole-frame box, not a circuit board"
+  },
+  {
+   "file": "drone_0026.jpg",
+   "verdict": "drop",
+   "reason": "wind-tunnel wing model, not a drone"
+  },
+  {
+   "file": "drone_0088.jpg",
+   "verdict": "keep",
+   "reason": "drone box+mask correct"
+  },
+  {
+   "file": "drone_0101.jpg",
+   "verdict": "keep",
+   "reason": "small drone, correct"
+  },
+  {
+   "file": "drone_0106.jpg",
+   "verdict": "keep",
+   "reason": "EHang-style passenger drone, correct object"
+  },
+  {
+   "file": "robot_arm_0023.jpg",
+   "verdict": "keep",
+   "reason": "arms correctly boxed, overlapping but all robot"
+  },
+  {
+   "file": "robot_arm_0025.jpg",
+   "verdict": "keep",
+   "reason": "correct"
+  },
+  {
+   "file": "robot_arm_0045.jpg",
+   "verdict": "keep",
+   "reason": "correct arm"
+  },
+  {
+   "file": "robot_arm_0057.jpg",
+   "verdict": "keep",
+   "reason": "correct arm"
+  },
+  {
+   "file": "robot_arm_0064.jpg",
+   "verdict": "keep",
+   "reason": "correct arm"
+  },
+  {
+   "file": "drone_0066.jpg",
+   "verdict": "keep",
+   "reason": "small drone/helicopter, correct"
+  },
+  {
+   "file": "drone_0067.jpg",
+   "verdict": "keep",
+   "reason": "small drone, correct"
+  },
+  {
+   "file": "robot_arm_0077.jpg",
+   "verdict": "keep",
+   "reason": "correct arm"
+  }
+ ]
+}
