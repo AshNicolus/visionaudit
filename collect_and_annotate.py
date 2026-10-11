@@ -21,6 +21,12 @@ MAX_SIDE = 1600  # saved images are downscaled to this
 MIN_SIDE = 720  # smaller sources are rejected as not high-res
 MAX_BYTES = 25 * 1024 * 1024
 LICENSE_OK = re.compile(r"\bCC\b|Creative Commons|public domain|\bPD\b", re.I)
+LICENSE_BAD = re.compile(r"\bN[CD]\b|NonCommercial|NoDerivs|No Derivatives", re.I)
+
+
+def license_ok(name):
+    """Open licence with no NonCommercial / NoDerivs clause."""
+    return bool(LICENSE_OK.search(name)) and not LICENSE_BAD.search(name)
 
 # class name -> Commons categories to crawl and the Grounding DINO text prompt
 CLASSES = {
@@ -182,7 +188,7 @@ def _download_one(page, request, cls, fpage):
     """Fetch one file page + image; returns a metadata record or None."""
     info = file_info(page, fpage)
     time.sleep(DELAY_S)
-    if not info or not LICENSE_OK.search(info["license"]):
+    if not info or not license_ok(info["license"]):
         return None
     if info["size"] and min(info["size"]) < MIN_SIDE:
         return None
