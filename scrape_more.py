@@ -18,7 +18,10 @@ EXTRA_CATS = {
     "circuit_board": ["Raspberry_Pi", "Arduino", "Single-board_computers", "Motherboards_by_brand",
                       "Electronic_circuit_boards", "Printed_circuit_boards_by_type"],
     "drone": ["DJI_Inspire", "Micro_air_vehicles", "Camera_drones", "Consumer_drones",
-              "Parrot_AR.Drone", "Racing_drones", "Agricultural_drones", "Delivery_drones"],
+              "Parrot_AR.Drone", "Racing_drones", "Agricultural_drones", "Delivery_drones",
+              "Quadcopters_in_flight", "DJI_Phantom_4", "DJI_Phantom_3", "Hobby_drones",
+              "Drones_in_Ukraine", "Military_unmanned_aerial_vehicles", "DJI_Matrice",
+              "Drones_by_manufacturer", "Fixed-wing_drones", "Unmanned_helicopters"],
 }
 
 
