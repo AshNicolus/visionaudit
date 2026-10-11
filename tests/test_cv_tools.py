@@ -62,3 +62,11 @@ def test_early_stopping_ignores_epochs_before_floor(tmp_path):
     assert not (tmp_path / "b.pt").exists()
     es.step(0.9, m)  # epoch 3 is the first allowed checkpoint
     assert (tmp_path / "b.pt").exists() and es.best == 0.9
+
+
+def test_compare_ensemble_pairs_ens_against_single():
+    import compare_cv
+    run = {"folds": [{"plain": {"acc": 0.5, "iou": 0.4, "box_l1": 0.2},
+                      "ens": {"acc": 0.6, "iou": 0.5, "box_l1": 0.1}} for _ in range(3)]}
+    rows = {m: mean for m, _, mean, _, _ in compare_cv.compare_ensemble(run)}
+    assert abs(rows["acc"] - 0.1) < 1e-9 and abs(rows["box_l1"] - 0.1) < 1e-9

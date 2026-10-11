@@ -19,7 +19,7 @@ export ANTHROPIC_API_KEY=...   # only needed for llm_auditor.py (anthropic backe
 
 ```bash
 python collect_and_annotate.py   # scrape, label, write data/coco/annotations.json
-python train.py --preset ema_crop --ann-path data/coco/annotations_v4_clean.json
+python train.py --preset ema_crop --ann-path data/coco/annotations_v5_clean.json
 tensorboard --logdir runs/tb
 python llm_auditor.py --demo
 pytest -q
@@ -31,7 +31,9 @@ pytest -q
 | --- | --- |
 | `collect_and_annotate.py` | Playwright scraper (Wikimedia Commons, CC images) and Grounding DINO + SAM labelling, validated COCO JSON |
 | `dataset.py` | COCO parser, OpenCV letterbox, normalize and affine augmentation that moves boxes and masks together |
-| `train.py` | Custom CNN, loss, scheduler, early stopping, TensorBoard |
+| `train.py` | Custom CNN, loss, scheduler, early stopping, TensorBoard, `--ensemble N` |
+| `cv.py`, `compare_cv.py` | Grouped 5-fold CV, optional seed ensemble, paired per-fold comparison |
+| `scrape_more.py`, `annotate_v5.py`, `make_v5_clean.py` | Top-up scrape with dedupe, labelling with review sheets, clean file from review |
 | `llm_auditor.py` | RAG over the COCO file and metrics log, with tool calling |
 | `tests/` | Geometry, COCO schema, training and auditor tests |
 
@@ -44,17 +46,18 @@ pytest -q
 
 ## Dataset
 
-Shipped set: 201 images, 228 annotations (circuit_board 92, robot_arm 80, drone 56), file
-`docs/data_v4/annotations_v4_clean.json`, sha256 `3ce6fb6d4fba8bf04edcc35eca52b2725971be7a4d7390a7c47ebbe6b007de01`.
-`train.py` with seed 42 splits it 161 train / 40 val.
+Shipped set (v5): 341 images, 383 annotations (robot_arm 133 images, circuit_board 132, drone 76), file
+`docs/data_v5/annotations_v5_clean.json`, sha256 `d28681b67fa4b1f75db649fe54c67eb196aeb29361d1dd000a4ffe2104b4497a`.
+Licences and URLs per file: `docs/data_v5/raw_meta.json` (CC BY, CC BY-SA, public domain only; NC/ND are rejected).
+The earlier v4clean set (201 images, sha `3ce6fb6d`, `docs/data_v4/`) is kept for the older tables.
 
-The scrape is not deterministic, so a fresh run gives different images. The reference dataset is the committed
-`docs/data_v4/annotations_v4_clean.json` (sha256 in `docs/data_v4/review.json`). To use it, copy it to
-`data/coco/annotations_v4_clean.json` and point `--ann-path` at it. The images are fetched with
-`collect_and_annotate.py`, `scrape_more.py` and `relabel_missed.py`; the exact flags used for the extra drone images were not recorded.
+The scrape is not deterministic. To use the reference file, copy it to `data/coco/annotations_v5_clean.json` and
+point `--ann-path` at it; fetch images with `scrape_more.py`, label with `annotate_v5.py`, apply the review with
+`make_v5_clean.py`. The target of 150 images per class was not reached (drone 76).
 
-I reviewed 19 relabelled images by eye on contact sheets and dropped 8 of them (`docs/data_v4/review.json`).
-The remaining Grounding DINO + SAM labels have not been reviewed.
+Labels are Grounding DINO + SAM. Reviewed by eye: all 221 labels added in v5 (74 dropped, reasons in
+`docs/data_v5/review.json`), 19 older relabels, and a random 40 of the older labels, which had 7 wrong (17.5%);
+those 7 were removed. The rest of the older labels (about 150 images) are not reviewed and likely hold more errors.
 
 ## Model
 
@@ -71,27 +74,29 @@ The CNN predicts the class and one normalized box (the largest object) per image
 
 ## Training run
 
-Evaluation is grouped 5-fold CV on the clean set (`cv.py`; near-duplicates stay in one fold, 3 training seeds per fold,
-plain metric, mean +- std over folds, deltas paired per fold). Details, other configs and limits: `docs/experiments.md`.
+Evaluation is grouped 5-fold CV on the v5 clean set (`cv.py`; near-duplicates stay in one fold, plain metric, mean +- std
+over folds, deltas paired per fold). Details: `docs/experiments.md`.
 
-| fold_seed 0 | val_acc | val_iou | paired delta acc / iou vs baseline |
+| fold_seed 0, v5 | val_acc | val_iou | paired delta vs baseline (acc / iou) |
 | --- | --- | --- | --- |
-| baseline | 0.508 +- 0.068 | 0.467 +- 0.011 | - |
-| crop | 0.553 +- 0.063 | 0.477 +- 0.011 | +0.045 +- 0.040 / +0.010 +- 0.003 |
-| ema_crop | 0.563 +- 0.077 | 0.480 +- 0.011 | +0.055 +- 0.082 / +0.012 +- 0.006 |
+| baseline (3 seeds) | 0.537 +- 0.087 | 0.477 +- 0.012 | - |
+| ema_crop (3 seeds) | 0.567 +- 0.078 | 0.485 +- 0.013 | +0.030 +- 0.028 / +0.008 +- 0.004 |
 
-Confirmation with fold_seed 1 (baseline vs ema_crop): acc 0.569 vs 0.600 (delta +0.031 +- 0.032), IoU 0.465 vs 0.481
-(delta +0.016 +- 0.005).
+Seed ensemble (5 seeds, ema_crop, same folds): single-model mean acc 0.572, iou 0.486; ensemble acc 0.578, iou 0.489.
+Paired: acc +0.007 +- 0.026 (no change), iou +0.003 +- 0.001 (5 of 5 folds but tiny). Not worth 5x cost;
+`train.py --ensemble N` is available and off by default.
 
-Verdict: the IoU gain is established (better in 10 of 10 folds over both fold splits), but it is small, about +0.012 to
-+0.016, and mostly comes from box-crop. The accuracy gain is not established: it is under 1 std in both splits and one
-fold (+0.19) carries the mean. Absolute accuracy is only 0.5 to 0.6. The earlier single-split numbers (0.667 etc.) were
-optimistic; they are kept only in `docs/experiments.md`.
+Verdict: ema_crop's IoU gain reproduces on the bigger set (+0.008, 5 of 5 folds; +0.012 to +0.016 on v4clean), the
+accuracy gain is marginal (about 1 std, one fold carries it), the ensemble does not help accuracy. Accuracy sits at
+0.54 to 0.58 and is limited by data and label noise. v5 numbers are not comparable with the v4clean numbers
+(different images); the older tables are in `docs/experiments.md`.
 
-Shipped recipe (EMA 0.99, crop 0.5, 40 epochs, patience 8), seed 42, log in `docs/final/`:
+Shipped recipe (EMA 0.99, crop 0.5, 40 epochs, patience 8). The log in `docs/final/` is a seed-42 run on v4clean (not
+rerun on v5):
 
 ```bash
-python train.py --preset ema_crop --ann-path data/coco/annotations_v4_clean.json --seed 42
+python train.py --preset ema_crop --ann-path data/coco/annotations_v4_clean.json --seed 42   # the logged run
+python train.py --preset ema_crop --ann-path data/coco/annotations_v5_clean.json --seed 42   # same recipe on v5
 ```
 
 ```
@@ -104,7 +109,7 @@ Selected epoch 13 (val acc 0.575, IoU 0.531 on its own 40-image split; not compa
 
 ## Auditor
 
-Tools: `find_small_boxes`, `class_balance`, `bbox_area_stats`. Output of the tools on the real annotations:
+Tools: `find_small_boxes`, `class_balance`, `bbox_area_stats`. Output of the tools on the v4clean annotations:
 
 ```
 class_balance -> circuit_board 92, robot_arm 80, drone 56, imbalance ratio 1.64

@@ -1,6 +1,14 @@
 # Checkpoint, 2026-10-11
 
-Where things stand on `improve/model-v2`. Resume from here.
+## Branch `improve/data-ensemble` (latest, on top of main)
+
+- v5 dataset: 341 images / 383 annotations, sha `d28681b6`, all 221 new labels reviewed by eye (74 dropped), 7 of 40 sampled old labels wrong and removed; the remaining old labels are unreviewed. Files in `docs/data_v5/`.
+- CV on v5 (fold_seed 0, 3 seeds): base acc 0.537 / iou 0.477, ema_crop 0.567 / 0.485 (paired +0.030 +- 0.028, +0.008 +- 0.004). Results in `docs/cv/v5/`.
+- Ensemble of 5 (`cv.py --ensemble`, `train.py --ensemble N`): acc +0.007 +- 0.026, iou +0.003 +- 0.001 vs the single-model mean; not worth it.
+- Not reached: 150 images per class (drone 76). Still open: review the rest of the old labels, rerun `docs/final/` on v5.
+- Not merged; push only.
+
+Older notes below, from `improve/model-v2` (merged).
 
 ## On main (done)
 
