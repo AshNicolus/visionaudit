@@ -1,0 +1,22 @@
+epoch 1 train 1.1227 val 1.2813 acc 0.225 l1 0.1356 iou 0.440 lr 1.00e-03
+epoch 2 train 0.9947 val 1.0741 acc 0.450 l1 0.1271 iou 0.492 lr 9.98e-04
+epoch 3 train 0.9102 val 1.0483 acc 0.525 l1 0.1293 iou 0.474 lr 9.94e-04
+epoch 4 train 0.9143 val 1.2691 acc 0.475 l1 0.1203 iou 0.520 lr 9.86e-04
+epoch 5 train 0.9488 val 1.2935 acc 0.550 l1 0.1173 iou 0.523 lr 9.76e-04
+epoch 6 train 0.8704 val 1.2858 acc 0.525 l1 0.1191 iou 0.526 lr 9.62e-04
+epoch 7 train 0.9172 val 1.1727 acc 0.550 l1 0.1210 iou 0.517 lr 9.46e-04
+epoch 8 train 0.8775 val 1.1736 acc 0.575 l1 0.1180 iou 0.513 lr 9.26e-04
+epoch 9 train 0.8728 val 1.2084 acc 0.550 l1 0.1167 iou 0.514 lr 9.05e-04
+epoch 10 train 0.8688 val 1.3592 acc 0.525 l1 0.1185 iou 0.515 lr 8.80e-04
+epoch 11 train 0.8399 val 1.2750 acc 0.550 l1 0.1187 iou 0.519 lr 8.54e-04
+epoch 12 train 0.7941 val 1.2257 acc 0.625 l1 0.1176 iou 0.524 lr 8.25e-04
+epoch 13 train 0.8780 val 1.1326 acc 0.575 l1 0.1169 iou 0.531 lr 7.94e-04
+epoch 14 train 0.8399 val 1.2465 acc 0.600 l1 0.1167 iou 0.525 lr 7.61e-04
+epoch 15 train 0.8516 val 1.2886 acc 0.575 l1 0.1159 iou 0.527 lr 7.27e-04
+epoch 16 train 0.7733 val 1.4482 acc 0.600 l1 0.1159 iou 0.532 lr 6.91e-04
+epoch 17 train 0.7554 val 1.3800 acc 0.575 l1 0.1137 iou 0.530 lr 6.55e-04
+epoch 18 train 0.7324 val 1.4577 acc 0.525 l1 0.1152 iou 0.528 lr 6.17e-04
+epoch 19 train 0.6917 val 1.3886 acc 0.550 l1 0.1143 iou 0.526 lr 5.78e-04
+epoch 20 train 0.8055 val 1.5031 acc 0.525 l1 0.1176 iou 0.519 lr 5.39e-04
+epoch 21 train 0.7740 val 1.3222 acc 0.550 l1 0.1147 iou 0.521 lr 5.00e-04
+early stopping at epoch 21

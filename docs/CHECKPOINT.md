@@ -23,29 +23,34 @@ Baseline v2 on the 190-image set: 3 seeds, logs, archived annotations (`docs/bas
 - Only crop's IoU gain (+0.014, sd 0.007) passed the 1-sd bar in round 1, and it is small.
 - EMA and wider/deeper gains were fold-2 artefacts. Do not claim them.
 
-## Interrupted
+## CV results (done)
 
-The round-2 matrix (base, crop, ema, ema_crop; 3 seeds, floor 5) was stopped part way and has no results. Rerun it.
+v4 matrix, v4clean (4 configs) and a fold_seed 1 confirmation are in `docs/cv/` and written up in `docs/experiments.md`.
+ema_crop is best: IoU +0.012 to +0.016 in 10 of 10 folds, accuracy not established. `train.py --preset ema_crop` reproduces it.
+Final run logs are in `docs/final/`.
 
 ## Uncommitted, left out on purpose
 
-- `docs/data_v4/` (new drone labels, unreviewed), `docs/relabel_log_new_drones.json`, edits to `relabel_missed.py`: review the 13 new drone labels on a contact sheet before using them.
-- `docs/cv/ema_crop.json`: timestamp predates the matrix start, so its origin is unclear. Check or delete.
+- Nothing. The v4 labels were reviewed (`docs/data_v4/review.json`: 19 checked, 8 dropped, clean file of 201 images). The stray `docs/cv/ema_crop.json` of unknown origin was moved out of the repo.
 
 ## Open items from the monitor
 
-1. Pick plain vs TTA once and report both.
-2. Confirm the winner with a second FOLD_SEED.
-3. Expose the winning options in the `train.py` CLI, and make the shipped run write TensorBoard scalars and per-epoch augmented samples.
-4. Rebuild folds and rerun the baseline on any new image set; keep v2 and v3 tables separate.
-5. Rebase onto main (README was renamed in PR 8).
+1. Done: plain is the headline, TTA reported beside it.
+2. Done: fold_seed 1 confirmation (IoU confirmed, accuracy not).
+3. Done: `--preset ema_crop`; TensorBoard scalars and per-epoch samples are written by default.
+Still open:
+- Only 19 labels were reviewed by eye; the other Grounding DINO + SAM labels are not.
+- widedeep and sched were not rerun on v4clean.
+- `best_epochs` in the JSONs made before the cv.py fix can be earlier than the epoch used.
+- Rebuild folds and rerun the baseline on any new image set; keep dataset tables separate.
+- Rebase onto main (README was renamed in PR 8).
 
 ## Resume
 
 ```bash
 cd ~/augle-improve && git status
-./.venv/bin/python -u cv.py --name base --out-dir docs/cv   # then crop, ema, ema_crop
-./.venv/bin/python compare_cv.py
+./.venv/bin/python -u cv.py --name base --out-dir docs/cv/v4clean --ann-path data/coco/annotations_v4_clean.json
+./.venv/bin/python compare_cv.py docs/cv/v4clean/base.json docs/cv/v4clean/ema_crop.json
 ```
 
 Also rotate the vLLM API key that was pasted into the terminal.
