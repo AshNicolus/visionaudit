@@ -457,7 +457,8 @@ def main():
     ap.add_argument("--budget-s", type=int, help="stop scraping after this many seconds")
     ap.add_argument("--scrape-only", action="store_true", help="stop before annotation")
     args = ap.parse_args()
-    records = _load_meta() if args.skip_scrape else scrape_images(args.per_class, budget_s=args.budget_s)
+    records = (_load_meta() if args.skip_scrape
+               else scrape_images(args.per_class, budget_s=args.budget_s))
     if args.scrape_only:
         return
     coco = annotate_images(records)

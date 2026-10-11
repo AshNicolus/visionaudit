@@ -63,6 +63,9 @@ The CNN predicts the class and one normalized box (the largest object) per image
 - Six 3x3 conv layers, stride-2 downsampling, 32 to 256 channels, BatchNorm and ReLU. Receptive field is 47px.
 - One hand-written residual block at 64 channels to keep gradients flowing.
 - Global average pooling feeds a class head and a sigmoid box head.
+- Why 3x3 kernels: stacked small kernels give a larger receptive field with fewer parameters than one large kernel.
+- Why six conv layers: small enough to train from scratch on a few hundred images, deep enough for a 47px receptive field.
+- Why the residual skip: the identity path at 64 channels keeps gradients flowing and speeds early convergence.
 - Loss is CrossEntropy plus weighted SmoothL1.
 - Options, off by default: EMA of the weights (`--ema`), zoom-in box-crop augmentation (`--crop-prob`), flip TTA, warmup, wider/deeper variant.
 
@@ -121,4 +124,25 @@ It also runs against a self-hosted vLLM server (OpenAI-compatible, `Qwen/Qwen2.5
 ssh -p 31319 -L 20001:localhost:20001 ubuntu@117.18.102.47 -N   # keep open in another terminal
 export LLM_BASE_URL=http://localhost:20001/v1 LLM_API_KEY=... LLM_MODEL=Qwen/Qwen2.5-14B-Instruct
 python llm_auditor.py --backend openai --demo | tee docs/demo_output.txt
+```
+
+### End-to-end demo
+
+First lines of the saved run (the full file is `docs/demo_output.txt`):
+
+```
+=== Tool scenario 1: small boxes ===
+Q: How many bounding boxes cover less than 0.1% of their image, and which classes are they in?
+  [retrieved 5 chunks]
+    - Image robot_arm_0010.jpg (1200x1600) has 1 boxes: robot_arm x1. Smallest box covers 25.32% of the image, largest 25.32%.
+    - Image robot_arm_0018.jpg (1600x1200) has 1 boxes: robot_arm x1. Smallest box covers 1.75% of the image, largest 1.75%.
+    - Image circuit_board_0019.jpg (1600x875) has 1 boxes: circuit_board x1. Smallest box covers 58.65% of the image, largest 58.65%.
+    - Image robot_arm_0020.jpg (1600x1200) has 1 boxes: robot_arm x1. Smallest box covers 21.52% of the image, largest 21.52%.
+    - Image robot_arm_0048.jpg (1600x1065) has 1 boxes: robot_arm x1. Smallest box covers 28.56% of the image, largest 28.56%.
+  [tool] find_small_boxes({"max_area_fraction": 0.001, "limit": 100}) -> {"total_matches": 0, "total_boxes": 212, "matches_by_class": {}, "examples": []}
+A: There are no bounding boxes that cover less than 0.1% of their respective images out of the total 212 boxes in the dataset.
+
+=== Tool scenario 2: class imbalance ===
+Q: Is the dataset class-balanced? Give counts and the imbalance ratio, and say what it means for training.
+  [retrieved 5 chunks]
 ```
