@@ -1,0 +1,1302 @@
+{
+ "note": "Every label added after v4clean was reviewed by eye on contact sheets (green box, red mask outline). Older labels: random 40-image sample in old_sample_review.json.",
+ "clean_file": "docs/data_v5/annotations_v5_clean.json",
+ "sha256": "d28681b67fa4b1f75db649fe54c67eb196aeb29361d1dd000a4ffe2104b4497a",
+ "images": 341,
+ "annotations": 383,
+ "class_counts_images_annotations": {
+  "robot_arm": [
+   133,
+   147
+  ],
+  "circuit_board": [
+   132,
+   153
+  ],
+  "drone": [
+   76,
+   83
+  ]
+ },
+ "old_sample_dropped": {
+  "circuit_board_0035.jpg": "white plastic part, not a board",
+  "circuit_board_0072.jpg": "kaleidoscope art, not a board",
+  "drone_0027.jpg": "paper plane model",
+  "drone_0047.jpg": "news poster, tiny box on a graphic",
+  "robot_arm_0020.jpg": "automated guided vehicle, not an arm",
+  "robot_arm_0027.jpg": "humanoid robot torso, box covers whole scene",
+  "robot_arm_0056.jpg": "Nao humanoid, not an arm"
+ },
+ "new_labelled": 221,
+ "new_by_class": {
+  "circuit_board": 85,
+  "robot_arm": 98,
+  "drone": 38
+ },
+ "dropped": 74,
+ "dropped_by_class": {
+  "circuit_board": 28,
+  "robot_arm": 34,
+  "drone": 12
+ },
+ "detector_missed": [
+  "robot_arm_0174.jpg",
+  "robot_arm_0175.jpg",
+  "drone_0129.jpg",
+  "drone_0133.jpg"
+ ],
+ "reviews": [
+  {
+   "file": "circuit_board_0082.jpg",
+   "verdict": "drop",
+   "reason": "person, not a board"
+  },
+  {
+   "file": "circuit_board_0089.jpg",
+   "verdict": "drop",
+   "reason": "board lost in clutter, or tiny sensor on a toy"
+  },
+  {
+   "file": "circuit_board_0095.jpg",
+   "verdict": "drop",
+   "reason": "illustration or art, not a physical board"
+  },
+  {
+   "file": "circuit_board_0100.jpg",
+   "verdict": "drop",
+   "reason": "pile of many boards, whole-frame box"
+  },
+  {
+   "file": "circuit_board_0101.jpg",
+   "verdict": "drop",
+   "reason": "pile of many boards, whole-frame box"
+  },
+  {
+   "file": "circuit_board_0102.jpg",
+   "verdict": "drop",
+   "reason": "pile of many boards, whole-frame box"
+  },
+  {
+   "file": "circuit_board_0103.jpg",
+   "verdict": "drop",
+   "reason": "pile of many boards, whole-frame box"
+  },
+  {
+   "file": "circuit_board_0104.jpg",
+   "verdict": "drop",
+   "reason": "pile of many boards, whole-frame box"
+  },
+  {
+   "file": "circuit_board_0105.jpg",
+   "verdict": "drop",
+   "reason": "pile of many boards, whole-frame box"
+  },
+  {
+   "file": "circuit_board_0106.jpg",
+   "verdict": "drop",
+   "reason": "pile of many boards, whole-frame box"
+  },
+  {
+   "file": "circuit_board_0107.jpg",
+   "verdict": "drop",
+   "reason": "pile of many boards, whole-frame box"
+  },
+  {
+   "file": "circuit_board_0108.jpg",
+   "verdict": "drop",
+   "reason": "pile of many boards, whole-frame box"
+  },
+  {
+   "file": "circuit_board_0109.jpg",
+   "verdict": "drop",
+   "reason": "pile of many boards, whole-frame box"
+  },
+  {
+   "file": "circuit_board_0110.jpg",
+   "verdict": "drop",
+   "reason": "pile of many boards, whole-frame box"
+  },
+  {
+   "file": "circuit_board_0112.jpg",
+   "verdict": "drop",
+   "reason": "pile of many boards, whole-frame box"
+  },
+  {
+   "file": "circuit_board_0120.jpg",
+   "verdict": "drop",
+   "reason": "dark or blurred, box does not fit"
+  },
+  {
+   "file": "circuit_board_0125.jpg",
+   "verdict": "drop",
+   "reason": "macro of components, not a board"
+  },
+  {
+   "file": "circuit_board_0126.jpg",
+   "verdict": "drop",
+   "reason": "macro of components, not a board"
+  },
+  {
+   "file": "circuit_board_0127.jpg",
+   "verdict": "drop",
+   "reason": "macro of components, not a board"
+  },
+  {
+   "file": "circuit_board_0131.jpg",
+   "verdict": "drop",
+   "reason": "illustration or art, not a physical board"
+  },
+  {
+   "file": "circuit_board_0133.jpg",
+   "verdict": "drop",
+   "reason": "micrograph"
+  },
+  {
+   "file": "circuit_board_0134.jpg",
+   "verdict": "drop",
+   "reason": "micrograph"
+  },
+  {
+   "file": "circuit_board_0138.jpg",
+   "verdict": "drop",
+   "reason": "pile of many boards, whole-frame box"
+  },
+  {
+   "file": "circuit_board_0141.jpg",
+   "verdict": "drop",
+   "reason": "illustration or art, not a physical board"
+  },
+  {
+   "file": "circuit_board_0143.jpg",
+   "verdict": "drop",
+   "reason": "board lost in clutter, or tiny sensor on a toy"
+  },
+  {
+   "file": "circuit_board_0157.jpg",
+   "verdict": "drop",
+   "reason": "macro of components, not a board"
+  },
+  {
+   "file": "circuit_board_0158.jpg",
+   "verdict": "drop",
+   "reason": "macro of components, not a board"
+  },
+  {
+   "file": "circuit_board_0164.jpg",
+   "verdict": "drop",
+   "reason": "illustration or art, not a physical board"
+  },
+  {
+   "file": "drone_0108.jpg",
+   "verdict": "drop",
+   "reason": "insect or toy, not a drone"
+  },
+  {
+   "file": "drone_0109.jpg",
+   "verdict": "drop",
+   "reason": "insect or toy, not a drone"
+  },
+  {
+   "file": "drone_0110.jpg",
+   "verdict": "drop",
+   "reason": "insect or toy, not a drone"
+  },
+  {
+   "file": "drone_0112.jpg",
+   "verdict": "drop",
+   "reason": "part, battery, tool or phone, not a drone"
+  },
+  {
+   "file": "drone_0115.jpg",
+   "verdict": "drop",
+   "reason": "part, battery, tool or phone, not a drone"
+  },
+  {
+   "file": "drone_0123.jpg",
+   "verdict": "drop",
+   "reason": "part, battery, tool or phone, not a drone"
+  },
+  {
+   "file": "drone_0125.jpg",
+   "verdict": "drop",
+   "reason": "part, battery, tool or phone, not a drone"
+  },
+  {
+   "file": "drone_0132.jpg",
+   "verdict": "drop",
+   "reason": "box on person, car, animal or windsock, not the drone"
+  },
+  {
+   "file": "drone_0135.jpg",
+   "verdict": "drop",
+   "reason": "box on person, car, animal or windsock, not the drone"
+  },
+  {
+   "file": "drone_0136.jpg",
+   "verdict": "drop",
+   "reason": "box on person, car, animal or windsock, not the drone"
+  },
+  {
+   "file": "drone_0137.jpg",
+   "verdict": "drop",
+   "reason": "box on person, car, animal or windsock, not the drone"
+  },
+  {
+   "file": "drone_0145.jpg",
+   "verdict": "drop",
+   "reason": "box on person, car, animal or windsock, not the drone"
+  },
+  {
+   "file": "robot_arm_0081.jpg",
+   "verdict": "drop",
+   "reason": "messy or overlapping boxes, or tiny box on a crowded scene"
+  },
+  {
+   "file": "robot_arm_0098.jpg",
+   "verdict": "drop",
+   "reason": "wrong object (cabinet, machine, cables, pendant, welding)"
+  },
+  {
+   "file": "robot_arm_0099.jpg",
+   "verdict": "drop",
+   "reason": "wrong object (cabinet, machine, cables, pendant, welding)"
+  },
+  {
+   "file": "robot_arm_0101.jpg",
+   "verdict": "drop",
+   "reason": "circuit board filed under robot_arm"
+  },
+  {
+   "file": "robot_arm_0107.jpg",
+   "verdict": "drop",
+   "reason": "not an arm (mobile robots, car, sculpture, people)"
+  },
+  {
+   "file": "robot_arm_0109.jpg",
+   "verdict": "drop",
+   "reason": "not an arm (mobile robots, car, sculpture, people)"
+  },
+  {
+   "file": "robot_arm_0110.jpg",
+   "verdict": "drop",
+   "reason": "dark image, label unusable"
+  },
+  {
+   "file": "robot_arm_0111.jpg",
+   "verdict": "drop",
+   "reason": "dark image, label unusable"
+  },
+  {
+   "file": "robot_arm_0113.jpg",
+   "verdict": "drop",
+   "reason": "not an arm (mobile robots, car, sculpture, people)"
+  },
+  {
+   "file": "robot_arm_0122.jpg",
+   "verdict": "drop",
+   "reason": "wrong object (cabinet, machine, cables, pendant, welding)"
+  },
+  {
+   "file": "robot_arm_0124.jpg",
+   "verdict": "drop",
+   "reason": "not an arm (mobile robots, car, sculpture, people)"
+  },
+  {
+   "file": "robot_arm_0126.jpg",
+   "verdict": "drop",
+   "reason": "messy or overlapping boxes, or tiny box on a crowded scene"
+  },
+  {
+   "file": "robot_arm_0130.jpg",
+   "verdict": "drop",
+   "reason": "messy or overlapping boxes, or tiny box on a crowded scene"
+  },
+  {
+   "file": "robot_arm_0131.jpg",
+   "verdict": "drop",
+   "reason": "not an arm (mobile robots, car, sculpture, people)"
+  },
+  {
+   "file": "robot_arm_0132.jpg",
+   "verdict": "drop",
+   "reason": "messy or overlapping boxes, or tiny box on a crowded scene"
+  },
+  {
+   "file": "robot_arm_0139.jpg",
+   "verdict": "drop",
+   "reason": "messy or overlapping boxes, or tiny box on a crowded scene"
+  },
+  {
+   "file": "robot_arm_0143.jpg",
+   "verdict": "drop",
+   "reason": "messy or overlapping boxes, or tiny box on a crowded scene"
+  },
+  {
+   "file": "robot_arm_0150.jpg",
+   "verdict": "drop",
+   "reason": "wrong object (cabinet, machine, cables, pendant, welding)"
+  },
+  {
+   "file": "robot_arm_0152.jpg",
+   "verdict": "drop",
+   "reason": "wrong object (cabinet, machine, cables, pendant, welding)"
+  },
+  {
+   "file": "robot_arm_0154.jpg",
+   "verdict": "drop",
+   "reason": "messy or overlapping boxes, or tiny box on a crowded scene"
+  },
+  {
+   "file": "robot_arm_0158.jpg",
+   "verdict": "drop",
+   "reason": "messy or overlapping boxes, or tiny box on a crowded scene"
+  },
+  {
+   "file": "robot_arm_0162.jpg",
+   "verdict": "drop",
+   "reason": "messy or overlapping boxes, or tiny box on a crowded scene"
+  },
+  {
+   "file": "robot_arm_0163.jpg",
+   "verdict": "drop",
+   "reason": "messy or overlapping boxes, or tiny box on a crowded scene"
+  },
+  {
+   "file": "robot_arm_0165.jpg",
+   "verdict": "drop",
+   "reason": "messy or overlapping boxes, or tiny box on a crowded scene"
+  },
+  {
+   "file": "robot_arm_0166.jpg",
+   "verdict": "drop",
+   "reason": "messy or overlapping boxes, or tiny box on a crowded scene"
+  },
+  {
+   "file": "robot_arm_0167.jpg",
+   "verdict": "drop",
+   "reason": "messy or overlapping boxes, or tiny box on a crowded scene"
+  },
+  {
+   "file": "robot_arm_0169.jpg",
+   "verdict": "drop",
+   "reason": "wrong object (cabinet, machine, cables, pendant, welding)"
+  },
+  {
+   "file": "robot_arm_0170.jpg",
+   "verdict": "drop",
+   "reason": "wrong object (cabinet, machine, cables, pendant, welding)"
+  },
+  {
+   "file": "robot_arm_0171.jpg",
+   "verdict": "drop",
+   "reason": "wrong object (cabinet, machine, cables, pendant, welding)"
+  },
+  {
+   "file": "robot_arm_0172.jpg",
+   "verdict": "drop",
+   "reason": "wrong object (cabinet, machine, cables, pendant, welding)"
+  },
+  {
+   "file": "robot_arm_0173.jpg",
+   "verdict": "drop",
+   "reason": "wrong object (cabinet, machine, cables, pendant, welding)"
+  },
+  {
+   "file": "robot_arm_0176.jpg",
+   "verdict": "drop",
+   "reason": "wrong object (cabinet, machine, cables, pendant, welding)"
+  },
+  {
+   "file": "robot_arm_0177.jpg",
+   "verdict": "drop",
+   "reason": "wrong object (cabinet, machine, cables, pendant, welding)"
+  },
+  {
+   "file": "robot_arm_0178.jpg",
+   "verdict": "drop",
+   "reason": "wrong object (cabinet, machine, cables, pendant, welding)"
+  },
+  {
+   "file": "circuit_board_0080.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0081.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0083.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0084.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0085.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0086.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0087.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0088.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0090.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0091.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0092.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0093.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0094.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0096.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0097.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0098.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0099.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0111.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0113.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0114.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0115.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0116.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0117.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0118.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0119.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0121.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0122.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0123.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0124.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0128.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0129.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0130.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0132.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0135.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0136.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0137.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0139.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0140.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0142.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0144.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0145.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0146.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0147.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0148.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0149.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0150.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0151.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0152.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0153.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0154.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0155.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0156.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0159.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0160.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0161.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0162.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "circuit_board_0163.jpg",
+   "verdict": "keep",
+   "prompt": "a circuit board.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0080.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0082.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0083.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0084.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0085.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0086.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0087.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0088.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0089.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0090.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0091.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0092.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0093.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0094.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0095.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0096.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0097.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0100.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0102.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0103.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0104.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0105.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0106.jpg",
+   "verdict": "keep",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25
+  },
+  {
+   "file": "robot_arm_0108.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0112.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0114.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0115.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0116.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0117.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0118.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0119.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0120.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0121.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0123.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0125.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0127.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0128.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0129.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0133.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0134.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0135.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0136.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0137.jpg",
+   "verdict": "keep",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25
+  },
+  {
+   "file": "robot_arm_0138.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0140.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0141.jpg",
+   "verdict": "keep",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25
+  },
+  {
+   "file": "robot_arm_0142.jpg",
+   "verdict": "keep",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25
+  },
+  {
+   "file": "robot_arm_0144.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0145.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0146.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0147.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0148.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0149.jpg",
+   "verdict": "keep",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25
+  },
+  {
+   "file": "robot_arm_0151.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0153.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0155.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0156.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0157.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0159.jpg",
+   "verdict": "keep",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25
+  },
+  {
+   "file": "robot_arm_0160.jpg",
+   "verdict": "keep",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25
+  },
+  {
+   "file": "robot_arm_0161.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0164.jpg",
+   "verdict": "keep",
+   "prompt": "a robotic arm.",
+   "box_thr": 0.25
+  },
+  {
+   "file": "robot_arm_0168.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "robot_arm_0179.jpg",
+   "verdict": "keep",
+   "prompt": "a robot arm.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0107.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0111.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0113.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0114.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0116.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0117.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0118.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0119.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0120.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0121.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0122.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0124.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0126.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0127.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0128.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0130.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0131.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0134.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0138.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0139.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0140.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0141.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0142.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0143.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0144.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  },
+  {
+   "file": "drone_0146.jpg",
+   "verdict": "keep",
+   "prompt": "a drone.",
+   "box_thr": 0.35
+  }
+ ]
+}
