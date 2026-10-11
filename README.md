@@ -19,7 +19,7 @@ export ANTHROPIC_API_KEY=...   # only needed for llm_auditor.py (anthropic backe
 
 ```bash
 python collect_and_annotate.py   # scrape, label, write data/coco/annotations.json
-python train.py --epochs 40 --patience 8
+python train.py --preset ema_crop --ann-path data/coco/annotations_v4_clean.json
 tensorboard --logdir runs/tb
 python llm_auditor.py --demo
 pytest -q
@@ -42,9 +42,25 @@ pytest -q
 - `validate_coco()` runs before the file is written.
 - Augmentation boxes are the bounding box of the four transformed corners, masks use nearest-neighbour warps. Tests check both against ground truth.
 
-Training baseline (v2, seeds 42/1/2, rebuildable with data hashes and commands): `docs/baseline_v2/`.
+## Dataset
 
-Dataset: 190 images, 212 annotations (circuit_board 92, robot_arm 69, drone 51), split 152 train / 38 val. (The first version had 171 images; the scrape was extended to 80 per class.)
+Shipped set: 201 images, 228 annotations (circuit_board 92, robot_arm 80, drone 56), file
+`docs/data_v4/annotations_v4_clean.json`, sha256 `3ce6fb6d4fba8bf04edcc35eca52b2725971be7a4d7390a7c47ebbe6b007de01`.
+`train.py` with seed 42 splits it 161 train / 40 val.
+
+Rebuild, in order (the scrape is not deterministic, so images can differ; the committed JSON is the reference):
+
+```bash
+python collect_and_annotate.py                      # data/coco/annotations.json (v2: 190 images)
+python scrape_more.py --cls drone                   # more drone images
+python relabel_missed.py --src data/coco/annotations_v2.json --out data/coco/annotations_v3.json   # extra prompts for misses
+# v4 = docs/data_v4/annotations.json (sha d2acad01...); clean = v4 minus the 8 images dropped in docs/data_v4/review.json
+cp docs/data_v4/annotations_v4_clean.json data/coco/
+sha256sum data/coco/annotations_v4_clean.json
+```
+
+I reviewed 19 relabelled images by eye on contact sheets and dropped 8 of them (`docs/data_v4/review.json`).
+The remaining Grounding DINO + SAM labels have not been reviewed.
 
 ## Model
 
@@ -54,38 +70,49 @@ The CNN predicts the class and one normalized box (the largest object) per image
 - One hand-written residual block at 64 channels to keep gradients flowing.
 - Global average pooling feeds a class head and a sigmoid box head.
 - Loss is CrossEntropy plus weighted SmoothL1.
+- Options, off by default: EMA of the weights (`--ema`), zoom-in box-crop augmentation (`--crop-prob`), flip TTA, warmup, wider/deeper variant.
 
 ## Training run
 
-Full log in `docs/improved/train_log.txt` (metrics in `docs/improved/metrics.jsonl`, baseline in `docs/baseline/`).
-`python train.py --epochs 40 --patience 8`, seed 42. Early stopping triggered at epoch 25, best epoch 17.
-`metrics.jsonl` now also has `val_iou`.
+Evaluation is grouped 5-fold CV on the clean set (`cv.py`; near-duplicates stay in one fold, 3 training seeds per fold,
+plain metric, mean +- std over folds, deltas paired per fold). Details, other configs and limits: `docs/experiments.md`.
+
+| fold_seed 0 | val_acc | val_iou | paired delta acc / iou vs baseline |
+| --- | --- | --- | --- |
+| baseline | 0.508 +- 0.068 | 0.467 +- 0.011 | - |
+| crop | 0.553 +- 0.063 | 0.477 +- 0.011 | +0.045 +- 0.040 / +0.010 +- 0.003 |
+| ema_crop | 0.563 +- 0.077 | 0.480 +- 0.011 | +0.055 +- 0.082 / +0.012 +- 0.006 |
+
+Confirmation with fold_seed 1 (baseline vs ema_crop): acc 0.569 vs 0.600 (delta +0.031 +- 0.032), IoU 0.465 vs 0.481
+(delta +0.016 +- 0.005).
+
+Verdict: the IoU gain is established (better in 10 of 10 folds over both fold splits), but it is small, about +0.012 to
++0.016, and mostly comes from box-crop. The accuracy gain is not established: it is under 1 std in both splits and one
+fold (+0.19) carries the mean. Absolute accuracy is only 0.5 to 0.6. The earlier single-split numbers (0.667 etc.) were
+optimistic; they are kept only in `docs/experiments.md`.
+
+Shipped recipe (EMA 0.99, crop 0.5, 40 epochs, patience 8), seed 42, log in `docs/final/`:
+
+```bash
+python train.py --preset ema_crop --ann-path data/coco/annotations_v4_clean.json --seed 42
+```
 
 ```
-epoch 1 train 1.1752 val 1.1687 acc 0.316 l1 0.1409 iou 0.452 lr 1.00e-03
-epoch 17 train 0.9070 val 0.8503 acc 0.658 l1 0.1218 iou 0.519 lr 6.55e-04
-early stopping at epoch 25
+epoch 13 train 0.8780 val 1.1326 acc 0.575 l1 0.1169 iou 0.531 lr 7.94e-04
+epoch 21 train 0.7740 val 1.3222 acc 0.550 l1 0.1147 iou 0.521 lr 5.00e-04
+early stopping at epoch 21
 ```
 
-| | data | val_loss | val_acc | val_box_l1 | val_iou |
-| --- | --- | --- | --- | --- | --- |
-| Baseline, seed 42 | 171 images, 34 val | 1.007 | 0.529 | 0.156 | 0.392 |
-| Final, seed 42 | 190 images, 38 val | 0.850 | 0.658 | 0.122 | 0.519 |
-| Baseline, mean of seeds 42/1/2 | 171 images | 0.923 +- 0.066 | 0.559 +- 0.042 | 0.145 +- 0.012 | 0.450 +- 0.042 |
-| Final, mean of seeds 42/1/2 | 190 images | 0.849 +- 0.127 | 0.667 +- 0.075 | 0.130 +- 0.008 | 0.487 +- 0.027 |
-
-The val sets differ between rows (the split depends on the data size and the seed), and val has only 34 to 38 images, so
-these are tentative. The only change kept is more data. Class-weighted loss, stronger augmentation, label smoothing, weight
-decay, warmup and head dropout did not give a result that held up; details and per-seed numbers are in `docs/experiments.md`.
+Selected epoch 13 (val acc 0.575, IoU 0.531 on its own 40-image split; not comparable to the CV numbers).
 
 ## Auditor
 
 Tools: `find_small_boxes`, `class_balance`, `bbox_area_stats`. Output of the tools on the real annotations:
 
 ```
-class_balance -> circuit_board 92, robot_arm 69, drone 51, imbalance ratio 1.8
-find_small_boxes(max_area_fraction=0.02) -> 13 of 212 boxes (circuit_board 3, robot_arm 3, drone 7)
-bbox_area_stats -> median area fraction: circuit_board 0.36, robot_arm 0.14, drone 0.09
+class_balance -> circuit_board 92, robot_arm 80, drone 56, imbalance ratio 1.64
+find_small_boxes(max_area_fraction=0.02) -> 16 of 228 boxes (circuit_board 3, robot_arm 3, drone 10)
+bbox_area_stats -> median area fraction: circuit_board 0.36, robot_arm 0.14, drone 0.08
 ```
 
 LLM demo (two tool-call scenarios and a retrieval question), saved to `docs/demo_output.txt`:
