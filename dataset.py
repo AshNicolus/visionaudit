@@ -276,7 +276,7 @@ def get_dataloaders(ann_path="data/coco/annotations.json", img_dir="data/images"
     n = len(load_coco(ann_path)[0])
     train_idx, val_idx = split_indices(n, val_split, seed)
     train_ds = CocoDataset(ann_path, img_dir, train_idx, img_size, train=True, seed=seed,
-                          crop_prob=crop_prob)
+                           crop_prob=crop_prob)
     val_ds = CocoDataset(ann_path, img_dir, val_idx, img_size, train=False)
     gen = torch.Generator().manual_seed(seed)
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, generator=gen)

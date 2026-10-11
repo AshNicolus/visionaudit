@@ -48,7 +48,8 @@ def main(base_name, names):
             s = cand[mode]
             print(f"{n}: " + " ".join(f"{k} {v['mean']:.3f}+-{v['std']:.3f}" for k, v in s.items()))
             for m, d, mean, std, verdict in compare(base, cand, mode):
-                print(f"   {m:7s} deltas {np.round(d, 3).tolist()} mean {mean:+.3f} sd {std:.3f} -> {verdict}")
+                print(f"   {m:7s} deltas {np.round(d, 3).tolist()} "
+                      f"mean {mean:+.3f} sd {std:.3f} -> {verdict}")
 
 
 if __name__ == "__main__":
