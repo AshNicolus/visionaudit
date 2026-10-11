@@ -12,7 +12,7 @@ SIGN = {"acc": 1, "iou": 1, "box_l1": -1}
 
 # options a candidate may change; anything else must match the baseline exactly
 KNOBS = {"name", "ema", "crop_prob", "label_smoothing", "weight_decay", "warmup", "width",
-         "deep", "tb", "out_dir", "ann_path", "meta_path", "img_dir"}
+         "deep", "tb", "ensemble", "out_dir", "ann_path", "meta_path", "img_dir"}
 
 
 def load(name):
@@ -38,7 +38,25 @@ def compare(base, cand, mode="plain"):
     return rows
 
 
+def compare_ensemble(run):
+    """Paired per-fold deltas of the run's ensemble against its own single-model mean."""
+    one = {"folds": [{"plain": f["plain"]} for f in run["folds"]]}
+    two = {"folds": [{"plain": f["ens"]} for f in run["folds"]]}
+    return compare(one, two)
+
+
 def main(base_name, names):
+    if base_name == "--ens":
+        for n in names:
+            run = load(n)
+            print(f"== {n}: ensemble vs mean of single models, same folds")
+            print(" ".join(f"{k} {v['mean']:.3f}+-{v['std']:.3f}" for k, v in run["ens"].items()),
+                  "| single", " ".join(f"{k} {v['mean']:.3f}+-{v['std']:.3f}"
+                                       for k, v in run["plain"].items()))
+            for m, d, mean, std, verdict in compare_ensemble(run):
+                print(f"   {m:7s} deltas {np.round(d, 3).tolist()} mean {mean:+.3f} sd {std:.3f} "
+                      f"-> {verdict}")
+        return
     base = load(base_name)
     for mode in ("plain", "tta"):
         print(f"== {mode} vs {base_name}")

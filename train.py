@@ -220,6 +220,34 @@ def evaluate(model, loader, criterion, device, tta=False):
     return loss_sum / count, correct / count, l1_sum / count, iou_sum / count
 
 
+def evaluate_ensemble(models, loader, criterion, device):
+    """Same metrics as evaluate for a seed ensemble: class probabilities and boxes are averaged.
+
+    Returns (loss, accuracy, mean box L1, mean box IoU); loss uses the log of the mean
+    probabilities, like predict(tta=True).
+    """
+    for m in models:
+        m.eval()
+    loss_sum, correct, l1_sum, iou_sum, count = 0.0, 0, 0.0, 0.0, 0
+    with torch.no_grad():
+        for batch in loader:
+            images = batch["image"].to(device)
+            labels = batch["label"].to(device)
+            boxes = batch["box"].to(device)
+            outs = [m(images) for m in models]
+            prob = torch.stack([o[0].softmax(1) for o in outs]).mean(0)
+            pred = torch.stack([o[1] for o in outs]).mean(0)
+            logits = prob.clamp_min(1e-9).log()
+            n = images.size(0)
+            loss_sum += criterion(logits, pred, labels, boxes).item() * n
+            correct += (logits.argmax(1) == labels).sum().item()
+            l1_sum += (pred - boxes).abs().mean(1).sum().item()
+            iou_sum += cxcywh_iou(pred, boxes).sum().item()
+            count += n
+    count = max(count, 1)
+    return loss_sum / count, correct / count, l1_sum / count, iou_sum / count
+
+
 def draw_box_sample(image, box):
     """De-normalize a CHW tensor and draw a [cx, cy, w, h] box; returns CHW uint8 RGB."""
     img = image.detach().cpu().numpy().transpose(1, 2, 0)
@@ -319,6 +347,8 @@ def parse_args(argv=None):
     p.add_argument("--crop-prob", type=float, default=0.0, help="zoom-in crop around the box")
     p.add_argument("--width", type=float, default=1.0)
     p.add_argument("--deep", action="store_true")
+    p.add_argument("--ensemble", type=int, default=1,
+                   help="train N seeds, keep each best checkpoint, report the ensemble")
     p.add_argument("--min-epoch", type=int, default=1, help="no best-checkpoint before this epoch")
     p.add_argument("--run-dir", default=str(HERE / "runs"))
     p.add_argument("--ann-path", default=str(HERE / "data/coco/annotations.json"))
@@ -337,12 +367,21 @@ def main(argv=None):
         ann_path=args.ann_path, img_dir=args.img_dir,
         img_size=args.img_size, batch_size=args.batch_size, seed=args.seed,
         crop_prob=args.crop_prob)
-    set_seed(args.seed)
-    model = CustomCNN(num_classes, width=args.width, deep=args.deep)
-    train(model, train_loader, val_loader, args.epochs, args.lr, args.patience, args.seed,
-          run_dir=args.run_dir, label_smoothing=args.label_smoothing,
-          weight_decay=args.weight_decay, warmup=args.warmup, ema_decay=args.ema,
-          min_epoch=args.min_epoch)
+    models = []
+    for i in range(args.ensemble):
+        seed = args.seed + i
+        set_seed(seed)
+        model = CustomCNN(num_classes, width=args.width, deep=args.deep)
+        run_dir = args.run_dir if args.ensemble == 1 else f"{args.run_dir}/seed{seed}"
+        train(model, train_loader, val_loader, args.epochs, args.lr, args.patience, seed,
+              run_dir=run_dir, label_smoothing=args.label_smoothing,
+              weight_decay=args.weight_decay, warmup=args.warmup, ema_decay=args.ema,
+              min_epoch=args.min_epoch)
+        models.append(model)
+    if args.ensemble > 1:
+        dev = next(models[0].parameters()).device
+        loss, acc, l1, iou = evaluate_ensemble(models, val_loader, DetectionLoss().to(dev), dev)
+        print(f"ensemble of {len(models)}: val {loss:.4f} acc {acc:.3f} l1 {l1:.4f} iou {iou:.3f}")
 
 
 if __name__ == "__main__":

@@ -62,3 +62,27 @@ def test_preset_sets_recipe_and_defaults_stay():
     assert train.parse_args(["--preset", "ema_crop", "--ema", "0.9"]).ema == 0.9
     d = train.parse_args([])
     assert (d.ema, d.crop_prob, d.min_epoch, d.epochs) == (0.0, 0.0, 1, 30)
+
+
+def test_ensemble_averages_probabilities_and_boxes():
+    cpu = torch.device("cpu")
+    loader = fake_loader()
+    torch.manual_seed(0)
+    a, b = train.CustomCNN(3), train.CustomCNN(3)
+    crit = train.DetectionLoss()
+    # an ensemble of one model equals that model
+    one = train.evaluate_ensemble([a], loader, crit, cpu)
+    ref = train.evaluate(a, loader, crit, cpu)
+    assert all(abs(x - y) < 1e-5 for x, y in zip(one, ref))
+    # two models: accuracy/box match a hand-averaged prediction
+    ens = train.evaluate_ensemble([a, b], loader, crit, cpu)
+    a.eval(), b.eval()
+    correct, l1, n = 0, 0.0, 0
+    with torch.no_grad():
+        for batch in loader:
+            (la, ba), (lb, bb) = a(batch["image"]), b(batch["image"])
+            prob = (la.softmax(1) + lb.softmax(1)) / 2
+            correct += (prob.argmax(1) == batch["label"]).sum().item()
+            l1 += ((ba + bb) / 2 - batch["box"]).abs().mean(1).sum().item()
+            n += len(batch["label"])
+    assert abs(ens[1] - correct / n) < 1e-6 and abs(ens[2] - l1 / n) < 1e-5

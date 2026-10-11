@@ -72,8 +72,19 @@ def run_fold(k, split, args, rep=0):
     # the weights come from the floor-respecting checkpoint, so report that epoch
     best = min((r for r in hist if r["epoch"] >= args.min_epoch) or hist,
                key=lambda r: r["val_loss"])
-    return {"seed_rep": rep, "n_train": len(tr), "n_inner_val": len(val), "n_test": len(te),
-            "epochs_run": len(hist), "best_epoch": best["epoch"], **out}
+    return model, {"seed_rep": rep, "n_train": len(tr), "n_inner_val": len(val),
+                   "n_test": len(te), "epochs_run": len(hist), "best_epoch": best["epoch"],
+                   **out}
+
+
+def ensemble_fold(models, split, args):
+    """Score the fold's seed models as one ensemble (probabilities and boxes averaged)."""
+    te = CocoDataset(args.ann_path, args.img_dir, split[2].tolist(), args.img_size, train=False,
+                     seed=0)
+    dev = next(models[0].parameters()).device
+    loss, acc, l1, iou = T.evaluate_ensemble(models, DataLoader(te, batch_size=args.batch_size),
+                                             T.DetectionLoss().to(dev), dev)
+    return {"loss": loss, "acc": acc, "box_l1": l1, "iou": iou}
 
 
 def average_reps(k, reps):
@@ -87,6 +98,8 @@ def average_reps(k, reps):
 
 def summarize(folds, mode):
     keys = ("acc", "iou", "box_l1")
+    if mode not in folds[0]:
+        return None
     return {k: {"mean": float(np.mean([f[mode][k] for f in folds])),
                 "std": float(np.std([f[mode][k] for f in folds]))} for k in keys}
 
@@ -108,6 +121,8 @@ def parse_args(argv=None):
     p.add_argument("--deep", action="store_true")
     p.add_argument("--fold-seed", type=int, default=FOLD_SEED)
     p.add_argument("--seeds", type=int, default=3, help="training seeds per fold, averaged")
+    p.add_argument("--ensemble", action="store_true",
+                   help="also score the per-fold seed models as one averaged ensemble")
     p.add_argument("--min-epoch", type=int, default=5)
     p.add_argument("--tb", action="store_true", help="write TensorBoard logs per fold")
     p.add_argument("--ann-path", default=str(HERE / "data/coco/annotations.json"))
@@ -124,7 +139,10 @@ def main(argv=None):
     results = []
     for k, split in enumerate(folds):
         t0 = time.time()
-        r = average_reps(k, [run_fold(k, split, args, rep) for rep in range(args.seeds)])
+        pairs = [run_fold(k, split, args, rep) for rep in range(args.seeds)]
+        r = average_reps(k, [p[1] for p in pairs])
+        if args.ensemble:
+            r["ens"] = ensemble_fold([p[0] for p in pairs], split, args)
         results.append(r)
         plain = {m: round(v, 3) for m, v in r["plain"].items()}
         print(f"fold {k}: plain {plain} tta acc {r['tta']['acc']:.3f} "
@@ -132,10 +150,12 @@ def main(argv=None):
     meta = vars(args) | {"ann_sha256": hashlib.sha256(Path(args.ann_path).read_bytes()).hexdigest()}
     out = {"name": args.name, "args": meta, "folds": results,
            "plain": summarize(results, "plain"), "tta": summarize(results, "tta")}
+    if args.ensemble:
+        out["ens"] = summarize(results, "ens")
     Path(args.out_dir).mkdir(parents=True, exist_ok=True)
     with open(Path(args.out_dir) / f"{args.name}.json", "w") as f:
         json.dump(out, f, indent=1)
-    for mode in ("plain", "tta"):
+    for mode in ("plain", "tta") + (("ens",) if args.ensemble else ()):
         print(mode, {k: f"{v['mean']:.3f}+-{v['std']:.3f}" for k, v in out[mode].items()})
 
 
