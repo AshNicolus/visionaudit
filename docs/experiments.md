@@ -132,9 +132,66 @@ Shipping recipe: `python train.py --preset ema_crop --ann-path data/coco/annotat
 `docs/final/` (stopped at epoch 21, selected epoch 13: val acc 0.575, iou 0.531 on its own val split, which is not
 comparable to the CV numbers).
 
+## v5 dataset (341 images, 383 annotations, sha256 d28681b6) and seed ensemble
+
+More data: v4clean (201 images) was topped up from Wikimedia Commons with `scrape_more.py` (licence filter now also
+rejects NC/ND, sha256 + dHash<=10 dedupe against every existing image, titles with people/logo words skipped). The
+raw_meta of the final set has no NC/ND rows (before-scrape copy in `docs/data_v5/raw_meta_before.json`). New images
+were labelled with Grounding DINO + SAM (`annotate_v5.py`: default prompt at 0.35/0.25, then the best earlier prompts
+at 0.25/0.20; nothing lower): 221 labelled, 4 missed. Every one of the 221 was reviewed by eye on contact sheets;
+74 were dropped (33%: piles of boards, macro shots, micrographs, art, cabinets/CNC machines filed as robot arms,
+whole-frame or overlapping boxes, insects/toys/batteries as drones, people). Verdicts with reasons:
+`docs/data_v5/review.json`; clean file `docs/data_v5/annotations_v5_clean.json` (`make_v5_clean.py`, validate_coco passes).
+
+Old (v4clean) labels were never reviewed. A random 40-image sample (seed 0, `docs/data_v5/old_sample_review.json`)
+had 7 wrong labels (17.5%; a sample of 40, so the true rate is uncertain, plausibly 8% to 32%):
+non-board art, a plastic part, a paper plane, a news poster, an AGV, two humanoids. Those 7 are removed from v5; the
+other old labels are still unreviewed, so some wrong labels remain in them.
+
+Counts (images / annotations): robot_arm 133 / 147, circuit_board 132 / 153, drone 76 / 83. The target of 150 per
+class was not reached: the Commons categories yielded only ~40 usable new drone images. 276 groups
+(series key + dHash union) for 341 images; Fanuc factory and the sand-sculpture robot series are large groups.
+
+Same protocol as before: grouped 5-fold, fold_seed 0, floor 5, plain headline, 40 epochs / patience 8. `base` and
+`ema_crop` use 3 seeds per fold. These numbers are on a different image set and are not comparable with v4clean;
+`compare_cv.py` pairs only runs on the same file.
+
+| Run | acc | iou | box_l1 | TTA acc |
+| --- | --- | --- | --- | --- |
+| base (3 seeds) | 0.537 ± 0.087 | 0.477 ± 0.012 | 0.134 ± 0.001 | 0.542 |
+| ema_crop (3 seeds) | 0.567 ± 0.078 | 0.485 ± 0.013 | 0.132 ± 0.001 | 0.567 |
+
+Paired plain deltas ema_crop vs base (folds 0 to 4): acc +.010 / +.015 / +.010 / +.074 / +.044, mean +0.030 ± 0.028
+(marginal, a bit over 1 std; one fold carries it); iou +.014 / +.006 / +.003 / +.009 / +.007, mean +0.008 ± 0.004
+(better, 5 of 5); box_l1 +0.002 ± 0.002 (better, 5 of 5, tiny). With TTA the accuracy delta is +0.025 ± 0.030 (no
+change). The IoU gain reproduces on the larger set but is smaller than on v4clean (+0.012 to +0.016).
+
+### Ensemble (same folds, N=5 seeds, ema_crop recipe)
+
+`cv.py --seeds 5 --ensemble`: per fold the 5 seed models (each trained on the fold's train split, early-stopped on its
+inner val) are scored on the held-out fold with class probabilities and boxes averaged (`train.evaluate_ensemble`). The
+single-model row is the mean of the same 5 models, so the comparison is paired on identical folds and models.
+
+| Run | acc | iou | box_l1 |
+| --- | --- | --- | --- |
+| single model, mean of 5 seeds | 0.572 ± 0.087 | 0.486 ± 0.013 | 0.132 ± 0.001 |
+| ensemble of 5 | 0.578 ± 0.094 | 0.489 ± 0.013 | 0.131 ± 0.001 |
+
+Paired ensemble minus single: acc -.012 / -.024 / +.018 / +.044 / +.006, mean +0.007 ± 0.026 (no change); iou +.003 /
++.002 / +.005 / +.004 / +.003, mean +0.003 ± 0.001 (better in 5 of 5, but 0.003 is below the fold-to-fold spread
+of 0.013 and not practically meaningful); box_l1 +0.001 ± 0.000 (same story). The 5-seed single-model mean (acc 0.572)
+is the baseline for the ensemble; the 3-seed `ema_crop` run is not paired with it (different seed count).
+
+Verdict: absolute accuracy (0.54 to 0.57) is similar to v4clean (0.51 to 0.56) and nothing can be claimed across
+different image sets. ema_crop's IoU gain holds (+0.008, 5 of 5 folds), its accuracy gain is marginal. A 5-seed ensemble does not
+improve accuracy (+0.007, under 1 std) and gives +0.003 IoU. It costs 5x training and inference, so it is not
+recommended; `train.py --ensemble N` exists, off by default. Accuracy stays around 0.55 to 0.58, so the remaining
+limit is data (label noise in the unreviewed old labels, three small classes, 5 folds of about 68 images) rather
+than model variance.
+
 ## Limits
 
 - The 171-image `annotations.json` used for the baseline was overwritten by the re-scrape and was not archived, so the baseline cannot be rebuilt exactly. Its metrics are in `docs/baseline/`.
 - The shipped 190-image file has sha256 `0c2dba57ab20aad0965ef8a295f9197bd3acf8f8af6e4e6029e56f53003e4e6e`.
 - Full per-epoch logs are kept only for the shipped run (`docs/improved/`). Other rows list per-seed accuracy only.
-- New labels are unreviewed Grounding DINO + SAM output.
+- Older (v4clean) labels outside the 40-image sample are unreviewed.
