@@ -194,4 +194,4 @@ than model variance.
 - The 171-image `annotations.json` used for the baseline was overwritten by the re-scrape and was not archived, so the baseline cannot be rebuilt exactly. Its metrics are in `docs/baseline/`.
 - The shipped 190-image file has sha256 `0c2dba57ab20aad0965ef8a295f9197bd3acf8f8af6e4e6029e56f53003e4e6e`.
 - Full per-epoch logs are kept only for the shipped run (`docs/improved/`). Other rows list per-seed accuracy only.
-- New labels are unreviewed Grounding DINO + SAM output.
+- Older (v4clean) labels outside the 40-image sample are unreviewed.
